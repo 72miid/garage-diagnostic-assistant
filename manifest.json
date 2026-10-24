@@ -1,0 +1,10 @@
+{
+  "name": "Garage Diagnostic Assistant",
+  "short_name": "Garage Dx",
+  "description": "Vehicle symptom, DTC and live-data diagnostic workspace",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#090e14",
+  "theme_color": "#0b1017",
+  "lang": "en"
+}
