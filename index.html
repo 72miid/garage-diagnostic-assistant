@@ -18,7 +18,7 @@
 </style>
 </head>
 <body><div class="app">
-<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE</small></div></header>
+<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE · BUILD 9</small></div></header>
 <section class="hero"><div class="eyebrow">DIAGNOSE WITH CONFIDENCE</div><h2>Tell me what the car is doing.</h2><p class="muted">Answer one question at a time. The report uses your answers to prioritize safe next checks.</p><div class="mode"><button class="btn primary active" id="easy" type="button">Easy mode</button><button class="btn" id="pro" type="button">Workshop mode</button></div></section>
 <div class="row" style="margin:12px 0"><button class="btn" id="new" type="button">＋ New diagnosis</button><button class="btn" id="historyBtn" type="button">Case history (<span id="count">0</span>)</button></div>
 <section id="formArea">
@@ -38,7 +38,7 @@
 <section id="interactiveStep" class="hidden"><div class="panel"><div class="eyebrow" id="questionProgress">DIAGNOSTIC QUESTION</div><h2 id="questionTitle">Let’s narrow it down.</h2><p class="muted" id="questionHelp"></p><div id="questionOptions" class="symptoms"></div><p class="help" id="questionSafety"></p><div class="row"><button class="btn" id="questionBack" type="button">← Back</button><button class="btn primary" id="questionNext" type="button">Next question →</button></div></div></section>
 <section id="report" class="hidden"><div id="urgentBox"></div><div class="result"><div class="eyebrow">FIRST ASSESSMENT</div><h2 id="title"></h2><p id="intro"></p><span class="tag">Preliminary guidance — not a confirmed diagnosis</span></div><div class="panel"><h3>What the evidence may suggest</h3><div id="causes"></div></div><div class="panel"><h3>Your next checks</h3><div id="checks"></div></div><div class="panel"><h3>Code interpretation</h3><div id="codeInfo"></div><p class="help">Code status (stored, pending, permanent) must be read from a compatible scanner; it cannot be determined from the code number alone.</p></div><div class="panel"><h3>Your answers</h3><div id="answerSummary"></div></div><div class="row"><button class="btn primary" id="save" type="button">Save case</button><button class="btn" id="back" type="button">Edit answers</button><button class="btn" id="print" type="button">Print report</button></div></section>
 <section id="history" class="hidden"><div class="panel"><h3>Saved cases</h3><div id="historyList" class="muted">No saved cases yet.</div><div class="row"><button class="btn" id="historyBack" type="button">Back to diagnosis</button><button class="btn" id="export" type="button">Export history</button></div></div></section>
-<div class="foot">Prototype only. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
+<div class="foot">Prototype · BUILD 9. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
 <script>
 (()=>{
 'use strict';
@@ -49,7 +49,7 @@ function showStep(id){['carStep','symptomStep','scannerStep'].forEach(x=>$(x).cl
 function showPage(id){['formArea','interactiveStep','report','history'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo(0,0);}
 function setMode(m){mode=m;$('easy').classList.toggle('active',m==='easy');$('pro').classList.toggle('active',m==='pro');$('advancedFields').classList.toggle('hidden',m!=='pro');}
 function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function codeDescription(c){const map={P0171:'System too lean on bank 1. Possible causes include unmetered air, fuel delivery, exhaust leaks or sensor issues.',P0174:'System too lean on bank 2. Possible causes include air leaks, fuel delivery and sensor evidence.',P0300:'Random or multiple-cylinder misfire. Possible causes include ignition, fuel, air leaks or mechanical issues.',P0301:'Misfire detected on cylinder 1. Test ignition, fuel and mechanical condition before replacing parts.',P0302:'Misfire detected on cylinder 2. Test ignition, fuel and mechanical condition before replacing parts.',P0303:'Misfire detected on cylinder 3. Test ignition, fuel and mechanical condition before replacing parts.',P0304:'Misfire detected on cylinder 4. Test ignition, fuel and mechanical condition before replacing parts.',P0128:'Coolant temperature below expected thermostat-regulating temperature. Check warm-up behavior and sensor readings.',P0420:'Catalyst efficiency below threshold on bank 1. Verify exhaust leaks, misfire history and sensor operation first.',P0455:'Large EVAP leak detected. Inspect fuel cap and visible EVAP hoses; further testing may be needed.'};return map[c]||'Use model-specific service information to interpret this code and plan a confirming test. A code alone does not prove a part has failed.';}
+function codeDescription(c){const map={P0171:'System too lean on bank 1. Possible causes include unmetered air, fuel delivery, exhaust leaks or sensor issues.',P0174:'System too lean on bank 2. Possible causes include air leaks, fuel delivery and sensor evidence.',P0300:'Random or multiple-cylinder misfire. Possible causes include ignition, fuel, air leaks or mechanical issues.',P0301:'Misfire detected on cylinder 1. Test ignition, fuel and mechanical condition before replacing parts.',P0302:'Misfire detected on cylinder 2. Test ignition, fuel and mechanical condition before replacing parts.',P0303:'Misfire detected on cylinder 3. Test ignition, fuel and mechanical condition before replacing parts.',P0304:'Misfire detected on cylinder 4. Test ignition, fuel and mechanical condition before replacing parts.',P0305:'Misfire detected on cylinder 5. Confirm with misfire data and test ignition, fuel and mechanical condition before replacing parts.',P0306:'Misfire detected on cylinder 6. Confirm with misfire data and test ignition, fuel and mechanical condition before replacing parts.',P0307:'Misfire detected on cylinder 7. Confirm with misfire data and test ignition, fuel and mechanical condition before replacing parts.',P0308:'Misfire detected on cylinder 8. Confirm with misfire data and test ignition, fuel and mechanical condition before replacing parts.',P0128:'Coolant temperature below expected thermostat-regulating temperature. Check warm-up behavior and sensor readings.',P0420:'Catalyst efficiency below threshold on bank 1. Verify exhaust leaks, misfire history and sensor operation first.',P0455:'Large EVAP leak detected. Inspect fuel cap and visible EVAP hoses; further testing may be needed.'};return map[c]||'Use model-specific service information to interpret this code and plan a confirming test. A code alone does not prove a part has failed.';}
 function build(d){const causes=[],checks=[],s=d.symptom;
 if(s==='Overheating'){causes.push(['Possible cooling-system fault','Possible causes include low coolant, leaks, fan/control faults, thermostat, radiator flow or water pump.']);checks.push('If the temperature warning is on, the gauge is in the red, or steam appears, stop safely and switch off. Never open a hot cooling system.','When fully cold, check coolant level and visible leaks. Fan and flow tests should follow vehicle service information.');}
 else if(s==='Rough idle'){causes.push(['Possible misfire or uneven combustion','Possible causes include ignition, fuel delivery, intake leaks or a mechanical issue.']);checks.push('If the engine light flashes or shaking is severe, avoid driving.','With the engine off, inspect visible intake hoses and connectors. Save fault codes and freeze-frame data before clearing.');}
@@ -81,7 +81,7 @@ const q={
 'Warning light':[{title:'Which warning is on?',options:['Check-engine','Temperature','Oil pressure','Battery / charging','ABS / traction','Other / not sure'],safety:'If oil-pressure or temperature warnings are active, stop safely and switch off.'},{title:'Is it steady or flashing?',options:['Steady','Flashing','Comes and goes','Not sure']}],
 'Noise':[{title:'What kind of noise?',options:['Knocking / metallic tapping','Squealing','Grinding / scraping','Rattle / vibration','Humming / whining','Other / not sure']},{title:'When does it happen?',options:['Engine running while stopped','Changes with vehicle speed','Changes with engine RPM','During braking / turning','Not sure']}]
 };
-const base=q[d.symptom]||[{title:'When is the symptom strongest?',options:['At idle / stopped','While driving','During acceleration','Comes and goes','Not sure']}];
+const base=(q[d.symptom]||[{title:'When is the symptom strongest?',options:['At idle / stopped','While driving','During acceleration','Comes and goes','Not sure']}]).map(item=>({...item,options:[...item.options]}));
 base.push({title:'When is it most noticeable?',options:['At idle / stopped','While driving','During acceleration','All the time / intermittent','Not sure']});return base;}
 function renderQuestion(){const q=diagnosticQuestions[questionIndex];$('questionProgress').textContent='DIAGNOSTIC QUESTION '+(questionIndex+1)+' OF '+diagnosticQuestions.length;$('questionTitle').textContent=q.title;$('questionHelp').textContent=q.help||'Choose the closest answer. “Not sure” is a valid answer.';$('questionSafety').textContent=q.safety||'';$('questionOptions').innerHTML=q.options.map(o=>'<label class="symptom"><input type="radio" name="diagAnswer" value="'+escapeHTML(o)+'" '+(diagnosticAnswers[questionIndex]===o?'checked':'')+'>'+escapeHTML(o)+'</label>').join('');$('questionBack').textContent=questionIndex===0?'← Back to answers':'← Previous question';$('questionNext').textContent=questionIndex===diagnosticQuestions.length-1?'Build assessment →':'Next question →';}
 function runDiagnosis(){const d=getCase();if(!d.symptom){alert('Choose the main problem first.');showStep('symptomStep');return;}lastCase=d;diagnosticQuestions=questionsFor(d);questionIndex=0;diagnosticAnswers=[];renderQuestion();showPage('interactiveStep');}
@@ -136,9 +136,15 @@ function tailorAssessment(d,r){
   }
 
   if(d.symptom==='Low power'){
-    const shake=a[0]||'',load=a[1]||'',lamp=a[2]||'',when=a[3]||'';
-    // A flashing MIL with a running engine is a priority warning, but not proof of a specific failed part.
-    if(lamp==='Flashing'){
+    const norm=v=>String(v||'').toLowerCase().replace(/[’']/g,'').replace(/\s+/g,' ').trim();
+    const shake=norm(a[0]),load=norm(a[1]),lamp=norm(a[2]);
+    const isFlashing=lamp.includes('flashing');
+    const isShaking=shake.includes('shake')||shake.includes('stutter')||shake.includes('misfire');
+    const isSmooth=shake.includes('smooth');
+    const underLoad=load.includes('high speed')||load.includes('under load')||load.includes('acceleration');
+    const lowSpeed=load.includes('low rpm')||load.includes('stop')||load.includes('idle')||load.includes('low speed');
+
+    if(isFlashing){
       urgent={
         title:'Avoid load — flashing check-engine light',
         message:'A flashing check-engine light can indicate an active misfire that may damage the catalytic converter. Do not perform hard acceleration or repeated road tests.',
@@ -146,27 +152,28 @@ function tailorAssessment(d,r){
       };
       extraCauses.push(['Possible active misfire — needs confirmation','A flashing light raises concern for an active misfire, but it does not identify the cylinder or failed component by itself.']);
       extraChecks.push('When safe, retrieve stored and pending DTCs plus freeze-frame data. Do not clear codes before recording them.');
-      extraChecks.push('If codes or live data indicate misfire, follow the vehicle-specific ignition, fuel and compression test sequence; do not replace coils, plugs or injectors by guesswork.');
+      extraChecks.push('If codes or live data indicate misfire, follow the vehicle-specific ignition, fuel and mechanical test sequence; do not replace coils, plugs or injectors by guesswork.');
       suppressRoutine=true;
-    } else if(shake==='Yes — engine shakes / misfires'){
-      extraCauses.push(['Misfire or uneven combustion is a priority to check','Shaking together with low power can be consistent with a misfire, but further evidence is required to distinguish ignition, fuel, mechanical or air-metering causes.']);
+    } else if(isShaking){
+      extraCauses.push(['Misfire or uneven combustion is a priority to check','Shaking or stuttering together with low power can be consistent with a misfire, but evidence is required to distinguish ignition, fuel, mechanical or air-metering causes.']);
       extraChecks.push('Scan for stored and pending codes and save freeze-frame data. If the light begins flashing or shaking becomes severe, stop hard driving and arrange diagnosis.');
       extraChecks.push('Use cylinder-specific misfire counters and vehicle-specific ignition/fuel tests before replacing parts.');
-    } else if(load==='At high speed / under load'){
-      extraCauses.push(['Power loss under load — check data before replacing parts','Potential areas include fuel delivery under load, air-metering or throttle data, ignition timing/knock response, exhaust restriction and transmission behavior. The symptom alone does not identify which system is responsible.']);
-      extraChecks.push('Record codes and freeze-frame data, then compare commanded versus actual throttle, calculated load, fuel trims, intake-air readings and fuel pressure under the manufacturer-approved test procedure.');
-      extraChecks.push('If engine RPM rises without a matching increase in road speed, investigate transmission/clutch slip separately. Do not conduct unsafe high-speed tests on public roads.');
-    } else if(load==='At idle / low speed'){
+    } else if(underLoad){
+      extraCauses.push(['Power loss under load — check measured data first','Potential areas include fuel delivery under load, air-metering or throttle data, ignition timing/knock response, exhaust restriction and transmission behavior. The symptom alone does not identify which system is responsible.']);
+      extraChecks.push('Record stored and pending codes plus freeze-frame data. Then compare commanded versus actual throttle, calculated load, fuel trims, intake-air readings and fuel pressure using the manufacturer-approved test procedure.');
+      extraChecks.push('If engine RPM rises without a matching increase in road speed, assess possible transmission/clutch slip separately. Do not perform high-speed tests on public roads.');
+    } else if(lowSpeed){
       extraCauses.push(['Low-speed response needs idle and throttle data','Check for intake leaks, throttle/airflow plausibility and fuel-trim abnormalities using live data before deciding which component to test.']);
       extraChecks.push('Check codes and inspect intake ducting/connectors with the engine off. Compare idle and throttle data with service specifications.');
     } else {
-      extraChecks.push('Clarify whether power loss occurs only under load, at low speed, when hot/cold, or all the time; use that pattern to select the next test.');
+      extraCauses.push(['Power loss pattern needs clarification','The current answers do not establish whether the main issue is under-load fuel/air delivery, a misfire, throttle response or transmission behavior.']);
+      extraChecks.push('Record when the symptom occurs (cold/hot, low/high RPM, light/heavy load) and retrieve stored/pending codes before selecting the next test.');
     }
-    if(shake==='No, feels smooth but weak' && lamp!=='Flashing'){
+    if(isSmooth){
       extraCauses.push(['No obvious shake — do not assume a misfire','Smooth-feeling power loss can involve air/fuel delivery, throttle/load data, exhaust restriction or transmission behavior. Confirm with codes and measurements.']);
     }
-    if(lamp==='Steady on'){
-      extraChecks.push('A steady check-engine light warrants reading and recording stored/pending codes and freeze-frame data; do not infer a misfire solely from the lamp.');
+    if(lamp.includes('steady')){
+      extraChecks.push('A steady check-engine light warrants reading and recording stored/pending codes and freeze-frame data; it does not prove an active misfire.');
     }
   }
 
@@ -186,10 +193,6 @@ function tailorAssessment(d,r){
   }
   if(d.symptom==='Rough idle' && (a[0]||'')==='RPM rises and falls'){
     extraChecks.push('Check for intake/vacuum leaks and compare live fuel trims and idle data with vehicle service specifications before replacing sensors.');
-  }
-  if(d.symptom==='Low power' && (a[2]||'')==='Flashing'){
-    extraCauses.push(['Possible active misfire','A flashing check-engine light can indicate a catalyst-damaging misfire, especially if the engine stumbles.']);
-    extraChecks.push('Avoid hard acceleration and stop driving if the engine runs very roughly. Save codes and freeze-frame data.');
   }
   if(d.symptom==='Smoke or smell' && ['Fuel smell','Electrical / plastic burning smell','Smoke from engine bay'].includes(a[0]||'')){
     urgent={
@@ -256,7 +259,10 @@ function finishDiagnosis(){
   $('codeInfo').innerHTML=tailored.suppressRoutine
     ?'<div class="notice">Code interpretation is deferred until the vehicle is safe. Do not restart the engine to read codes if doing so could worsen the condition; have a technician retrieve them when appropriate.</div>'
     :(d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks when the vehicle is safe.');
-  $('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('');
+  const live=Object.entries(d.liveData||{}).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);
+  const liveLabel={ect:'Coolant temperature (°C)',rpm:'RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)'};
+  $('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('')+
+    (live.length?'<div class="cause"><strong>Workshop live-data entries</strong><p>'+live.map(([k,v])=>escapeHTML(liveLabel[k]||k)+': '+escapeHTML(v)).join('<br>')+'</p><p class="help">These manually entered values are shown for reference; this prototype does not automatically validate or interpret them.</p></div>':'');
   showPage('report');
 }
 function historyItems(){try{return JSON.parse(localStorage.getItem('garageDxCases')||'[]')}catch(e){return[];}}
@@ -270,8 +276,17 @@ $('diagnose').addEventListener('click',runDiagnosis);
 $('questionNext').addEventListener('click',()=>{const a=checked('diagAnswer');if(!a){alert('Choose an answer or select “Not sure”.');return;}diagnosticAnswers[questionIndex]=a;if(questionIndex<diagnosticQuestions.length-1){questionIndex++;renderQuestion();window.scrollTo(0,0);}else{finishDiagnosis();}});
 $('questionBack').addEventListener('click',()=>{if(questionIndex>0){questionIndex--;renderQuestion();}else{showPage('formArea');showStep('scannerStep');}});
 $('easy').addEventListener('click',()=>setMode('easy'));$('pro').addEventListener('click',()=>setMode('pro'));
-$('new').addEventListener('click',()=>{showPage('formArea');showStep('carStep');});
-$('back').addEventListener('click',()=>{showPage('formArea');showStep('scannerStep');});
+$('new').addEventListener('click',()=>{
+  lastCase=null;diagnosticQuestions=[];diagnosticAnswers=[];questionIndex=0;
+  document.querySelectorAll('input[type="radio"]').forEach(el=>{el.checked=el.defaultChecked;});
+  ['codes','ect','rpm','stft','ltft'].forEach(id=>$(id).value='');
+  $('save').textContent='Save case';
+  showPage('formArea');showStep('carStep');
+});
+$('back').addEventListener('click',()=>{
+  if(!lastCase)return;
+  questionIndex=0;renderQuestion();showPage('interactiveStep');
+});
 $('historyBack').addEventListener('click',()=>showPage('formArea'));$('historyBtn').addEventListener('click',renderHistory);
 $('print').addEventListener('click',()=>window.print());
 $('save').addEventListener('click',()=>{if(!lastCase)return;const a=historyItems();a.unshift({...lastCase,diagnosticAnswers:diagnosticQuestions.map((q,i)=>({question:q.title,answer:diagnosticAnswers[i]||''})),id:Date.now()});try{localStorage.setItem('garageDxCases',JSON.stringify(a.slice(0,50)));updateCount();$('save').textContent='Saved ✓';}catch(e){alert('Unable to save on this browser. You can still print the report.');}});
