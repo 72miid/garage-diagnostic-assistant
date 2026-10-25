@@ -135,6 +135,41 @@ function tailorAssessment(d,r){
     }
   }
 
+  if(d.symptom==='Low power'){
+    const shake=a[0]||'',load=a[1]||'',lamp=a[2]||'',when=a[3]||'';
+    // A flashing MIL with a running engine is a priority warning, but not proof of a specific failed part.
+    if(lamp==='Flashing'){
+      urgent={
+        title:'Avoid load — flashing check-engine light',
+        message:'A flashing check-engine light can indicate an active misfire that may damage the catalytic converter. Do not perform hard acceleration or repeated road tests.',
+        action:'If the engine is shaking badly, power is severely reduced, or the light keeps flashing, stop safely and arrange diagnosis. Save codes and freeze-frame data before clearing faults.'
+      };
+      extraCauses.push(['Possible active misfire — needs confirmation','A flashing light raises concern for an active misfire, but it does not identify the cylinder or failed component by itself.']);
+      extraChecks.push('When safe, retrieve stored and pending DTCs plus freeze-frame data. Do not clear codes before recording them.');
+      extraChecks.push('If codes or live data indicate misfire, follow the vehicle-specific ignition, fuel and compression test sequence; do not replace coils, plugs or injectors by guesswork.');
+      suppressRoutine=true;
+    } else if(shake==='Yes — engine shakes / misfires'){
+      extraCauses.push(['Misfire or uneven combustion is a priority to check','Shaking together with low power can be consistent with a misfire, but further evidence is required to distinguish ignition, fuel, mechanical or air-metering causes.']);
+      extraChecks.push('Scan for stored and pending codes and save freeze-frame data. If the light begins flashing or shaking becomes severe, stop hard driving and arrange diagnosis.');
+      extraChecks.push('Use cylinder-specific misfire counters and vehicle-specific ignition/fuel tests before replacing parts.');
+    } else if(load==='At high speed / under load'){
+      extraCauses.push(['Power loss under load — check data before replacing parts','Potential areas include fuel delivery under load, air-metering or throttle data, ignition timing/knock response, exhaust restriction and transmission behavior. The symptom alone does not identify which system is responsible.']);
+      extraChecks.push('Record codes and freeze-frame data, then compare commanded versus actual throttle, calculated load, fuel trims, intake-air readings and fuel pressure under the manufacturer-approved test procedure.');
+      extraChecks.push('If engine RPM rises without a matching increase in road speed, investigate transmission/clutch slip separately. Do not conduct unsafe high-speed tests on public roads.');
+    } else if(load==='At idle / low speed'){
+      extraCauses.push(['Low-speed response needs idle and throttle data','Check for intake leaks, throttle/airflow plausibility and fuel-trim abnormalities using live data before deciding which component to test.']);
+      extraChecks.push('Check codes and inspect intake ducting/connectors with the engine off. Compare idle and throttle data with service specifications.');
+    } else {
+      extraChecks.push('Clarify whether power loss occurs only under load, at low speed, when hot/cold, or all the time; use that pattern to select the next test.');
+    }
+    if(shake==='No, feels smooth but weak' && lamp!=='Flashing'){
+      extraCauses.push(['No obvious shake — do not assume a misfire','Smooth-feeling power loss can involve air/fuel delivery, throttle/load data, exhaust restriction or transmission behavior. Confirm with codes and measurements.']);
+    }
+    if(lamp==='Steady on'){
+      extraChecks.push('A steady check-engine light warrants reading and recording stored/pending codes and freeze-frame data; do not infer a misfire solely from the lamp.');
+    }
+  }
+
   if(d.symptom==='No start'){
     const a0=a[0]||'';
     if(['No crank / silence','One click or repeated clicks','Cranks slowly'].includes(a0)){
@@ -192,8 +227,8 @@ function tailorAssessment(d,r){
     // Safety-first mode: suppress generic causes and routine checks when urgent.
     r.checks=extraChecks;
     r.causes=extraCauses;
-  } else if(d.symptom==='Overheating'){
-    // Overheating has its own answer-driven pathway: do not append generic cooling steps.
+  } else if(d.symptom==='Overheating' || d.symptom==='Low power'){
+    // Dedicated answer-driven pathways: do not append generic steps that dilute the priority.
     r.causes=extraCauses.length?extraCauses:r.causes;
     r.checks=extraChecks.length?extraChecks:r.checks;
   } else {
