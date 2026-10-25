@@ -186,13 +186,14 @@ function tailorAssessment(d,r){
 
   // Remove generic steps that would repeat or contradict the answer-specific plan.
   if(suppressRoutine){
-    r.checks=[];
+    // Safety-first mode: suppress generic causes and routine checks when urgent.
+    r.checks=extraChecks;
     r.causes=extraCauses;
   } else {
     r.causes=extraCauses.concat(r.causes);
     r.checks=extraChecks.concat(r.checks);
   }
-  return {result:r,urgent};
+  return {result:r,urgent,suppressRoutine};
 }
 function finishDiagnosis(){
   const d=lastCase;if(!d)return;
@@ -202,11 +203,17 @@ function finishDiagnosis(){
     ?'<div class="alert" role="alert"><div class="eyebrow">SAFETY PRIORITY</div><h2>'+escapeHTML(tailored.urgent.title)+'</h2><p>'+escapeHTML(tailored.urgent.message)+'</p><p><strong>What to do:</strong> '+escapeHTML(tailored.urgent.action)+'</p></div>'
     :'';
   $('title').textContent=[d.year==='Other'?'':d.year,d.make,d.model,d.engine==='Unknown'?'':d.engine].filter(Boolean).join(' ')||'Vehicle diagnosis';
-  $('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. Guidance is prioritized using your answers. '+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied; symptom-based checks are shown.');
+  $('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. '+(tailored.suppressRoutine?'Safety priority is active; routine diagnostics are paused. ':'Guidance is prioritized using your answers. ')+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied.');
   $('causes').innerHTML=r.causes.map(([a,b])=>'<div class="cause"><strong>'+escapeHTML(a)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('');
-  $('checks').innerHTML=r.checks.map((x,i)=>'<div class="step"><b>STEP '+(i+1)+'</b><p>'+escapeHTML(x)+'</p></div>').join('');
-  if(!r.checks.length)$('checks').innerHTML='<div class="notice">No routine checks are shown because the reported condition requires a safety-first response. Follow the warning above before further diagnosis.</div>';
-  $('codeInfo').innerHTML=d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks when the vehicle is safe.';
+  $('checks').innerHTML=r.checks.map((x,i)=>'<div class="step"><b>'+(tailored.suppressRoutine?'SAFETY ACTION '+(i+1):'STEP '+(i+1))+'</b><p>'+escapeHTML(x)+'</p></div>').join('');
+  if(tailored.suppressRoutine){
+    $('checks').insertAdjacentHTML('afterbegin','<div class="notice"><strong>Routine diagnostic tests paused.</strong><p>Resolve the safety concern first. Do not run the engine to collect more evidence.</p></div>');
+  } else if(!r.checks.length){
+    $('checks').innerHTML='<div class="notice">No additional checks are available from the current answers. Follow vehicle-specific service information.</div>';
+  }
+  $('codeInfo').innerHTML=tailored.suppressRoutine
+    ?'<div class="notice">Code interpretation is deferred until the vehicle is safe. Do not restart the engine to read codes if doing so could worsen the condition; have a technician retrieve them when appropriate.</div>'
+    :(d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks when the vehicle is safe.');
   $('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('');
   showPage('report');
 }
