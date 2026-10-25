@@ -112,7 +112,8 @@ function tailorAssessment(d,r){
     }
     if(fan==='Fan does not run'){
       extraCauses.push(['Fan circuit needs testing','A fan that does not run when expected may involve its motor, power, ground, fuse, relay, wiring, control command or temperature input.']);
-      extraChecks.push('Test fan power, ground, fuses/relays and control command before replacing any part.');
+      extraChecks.push('With the vehicle safely parked and following the wiring diagram, check the fan fuse and relay, then verify power and ground at the fan when the control system commands it on.');
+      extraChecks.push('If correct power and ground reach the fan but it does not run, test the fan motor and connector. If power/ground are absent, trace the control circuit before replacing parts.');
     } else if(fan==='Fan runs but temperature rises'){
       extraCauses.push(['Fan operation does not rule out other cooling faults','Since the fan reportedly runs, verify its speed and airflow, then investigate coolant level, pressure, radiator restriction, thermostat and circulation as appropriate.']);
       extraChecks.push('Do not replace the fan based on this answer alone. Verify airflow and continue with pressure/flow tests according to service information.');
@@ -126,7 +127,9 @@ function tailorAssessment(d,r){
       extraCauses.push(['Coolant loss is a priority finding','Low coolant or a visible leak can cause overheating. The source of coolant loss must be identified; topping up alone may not solve it.']);
       extraChecks.push('If coolant is very low or leaking significantly, do not run the engine. Once fully cold, arrange leak diagnosis and repair before normal driving.');
     } else if(coolant==='At the correct level'){
-      extraChecks.push('A correct cold coolant level does not rule out pressure loss, trapped air, radiator restriction, thermostat problems or a water-pump issue.');
+      if(fan!=='Fan does not run'){
+        extraChecks.push('A correct cold coolant level does not rule out pressure loss, trapped air, radiator restriction, thermostat problems or a water-pump issue.');
+      }
     } else {
       extraChecks.push('Check the reservoir only after the engine is completely cold. If you cannot safely confirm the level, have a technician inspect it.');
     }
@@ -189,6 +192,10 @@ function tailorAssessment(d,r){
     // Safety-first mode: suppress generic causes and routine checks when urgent.
     r.checks=extraChecks;
     r.causes=extraCauses;
+  } else if(d.symptom==='Overheating'){
+    // Overheating has its own answer-driven pathway: do not append generic cooling steps.
+    r.causes=extraCauses.length?extraCauses:r.causes;
+    r.checks=extraChecks.length?extraChecks:r.checks;
   } else {
     r.causes=extraCauses.concat(r.causes);
     r.checks=extraChecks.concat(r.checks);

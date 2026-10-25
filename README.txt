@@ -1,18 +1,21 @@
-# Garage Diagnostic Assistant — Phase 1 refinement v6
+# Garage Diagnostic Assistant — Diagnostic Priority v7
 
-Replace `index.html`, `manifest.json`, and `sw.js` in the repository root. Commit changes and wait for GitHub Pages to publish.
+Replace `index.html`, `manifest.json`, and `sw.js` in the root of the GitHub Pages repository. Commit changes and wait for deployment.
 
-## Fix in v6
-Urgent safety states show only safety-relevant causes and actions. Generic diagnostic checks are suppressed instead of being appended after the warning. Actions are labeled `SAFETY ACTION`, a notice says routine diagnostics are paused, and code interpretation is deferred while the vehicle may be unsafe. Cache name bumped to `garage-dx-phase1-v6`.
+## What changed
+- Non-urgent overheating now uses an answer-driven report instead of appending generic cooling-system causes and repeated routine checks.
+- If overheating is mainly at low speed and the fan is reported not to run, the report prioritizes fan circuit testing.
+- The fan path now separates checking fuse/relay and commanded power/ground from testing the fan motor, avoiding premature parts replacement.
+- If the cold coolant level is already confirmed correct and the fan is not running, the report no longer adds a redundant coolant-level reminder.
+- Urgent safety behavior from v6 is retained.
+- Cache version bumped to `garage-dx-diagnostic-priority-v7`.
 
-## Acceptance checks
-1. Overheating + red gauge/warning/steam: top safety banner appears; routine checks are paused; no generic repeated cooling-system steps appear.
-2. Overheating without danger-zone warning + low-speed symptom + fan does not run: report prioritizes fan-circuit testing.
-3. Overheating without danger-zone warning + fan runs but temperature rises: report prioritizes airflow confirmation and coolant/radiator/thermostat/circulation checks.
-4. Oil-pressure warning: urgent banner and no routine engine-running tests.
-5. Smoke/fuel/electrical burning: safety banner and no routine test prompts.
-6. Non-urgent symptoms still show answer-based checks and codes.
-7. New diagnosis, save, history, export, and print controls remain available.
+## Acceptance tests
+1. Overheating + danger-zone answer: safety banner appears and routine diagnostics are paused.
+2. Overheating but not red + low-speed/slow traffic + fan does not run + coolant at correct level: prioritize fan circuit; no generic duplicate cooling checks and no repeated coolant-level reminder.
+3. Same symptoms but fan runs while temperature rises: prioritize verifying fan speed/airflow, then coolant/radiator/thermostat/circulation tests.
+4. Non-overheating symptoms continue to use their symptom-specific checks.
+5. New diagnosis, save/history, export and print controls remain available.
 
 ## Limitations
-Rules-based prototype only; not a live OBD-II connection and not a confirmed diagnosis. Use vehicle-specific service information. Never open a hot cooling system.
+Rules-based prototype only. No live OBD-II connection and no confirmed part diagnosis. Follow vehicle-specific service information and do not open a hot cooling system.
