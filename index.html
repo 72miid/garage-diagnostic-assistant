@@ -108,9 +108,81 @@ base.push({title:'When is it most noticeable?',help:'This helps compare the symp
 return base;}
 function renderQuestion(){const q=diagnosticQuestions[questionIndex];$('questionProgress').textContent='DIAGNOSTIC QUESTION '+(questionIndex+1)+' OF '+diagnosticQuestions.length;$('questionTitle').textContent=q.title;$('questionHelp').textContent=q.help||'Choose the closest answer. “Not sure” is a valid answer.';$('questionSafety').textContent=q.safety||'';$('questionOptions').innerHTML=q.options.map(o=>'<label class="symptom"><input type="radio" name="diagAnswer" value="'+escapeHTML(o)+'" '+(diagnosticAnswers[questionIndex]===o?'checked':'')+'>'+escapeHTML(o)+'</label>').join('');$('questionBack').textContent=questionIndex===0?'← Back to answers':'← Previous question';$('questionNext').textContent=questionIndex===diagnosticQuestions.length-1?'Build assessment →':'Next question →';}
 function runDiagnosis(){const d=getCase();if(!d.symptom){alert('Choose the main problem first.');showStep('symptomStep');return;}lastCase=d;diagnosticQuestions=questionsFor(d);questionIndex=0;diagnosticAnswers=[];renderQuestion();showPage('interactiveStep');}
-function finishDiagnosis(){const d=lastCase;if(!d)return;const evidence=diagnosticQuestions.map((q,i)=>q.title+': '+(diagnosticAnswers[i]||'Not answered'));const r=build(d);
+function tailorAssessment(d,r){
+const a=diagnosticAnswers, extraCauses=[], extraChecks=[];
+if(d.symptom==='Overheating'){
+ const danger=a[0]||'',when=a[1]||'',fan=a[2]||'',coolant=a[3]||'';
+ if(danger.startsWith('Yes')){
+  extraCauses.push(['Immediate overheating risk','Your answer indicates a possible danger-zone temperature. The priority is preventing engine damage, not further running tests.']);
+  extraChecks.unshift('Stop safely, switch the engine off and let it cool completely. Do not open the radiator or coolant reservoir while hot. Arrange recovery if the temperature warning, red gauge or steam occurred.');
+ } else {
+  if(when==='Mostly stopped or idling'||when==='In slow traffic'){
+   extraCauses.push(['Airflow / fan control deserves early testing','The temperature rises mainly at low speed. Check fan command and operation, fan speeds, fuses, relays and control wiring using vehicle-specific service information. This pattern does not prove the fan is faulty.']);
+   extraChecks.unshift('When safe and with proper precautions, verify fan operation and commanded speeds using the correct service procedure. Keep hands and tools clear: electric fans can start unexpectedly.');
+  } else if(when==='At highway speed too'||when==='Both stopped and moving'){
+   extraCauses.push(['Cooling capacity or coolant circulation needs checking','Overheating while moving as well as stopped makes it important to verify coolant level, leaks, radiator flow, thermostat operation and water-pump circulation; the answers alone cannot identify the failed part.']);
+   extraChecks.unshift('With the engine fully cold, check coolant level and visible leaks. If the level is correct, arrange cooling-system pressure and circulation tests according to service information.');
+  }
+  if(fan==='Fan does not run'){
+   extraCauses.push(['Fan operation not confirmed','A fan that does not run when expected may reflect the fan motor, power supply, relay, wiring, control module or temperature input.']);
+   extraChecks.unshift('Test fan power, ground, fuses/relays and commanded operation before replacing the fan or any control part.');
+  } else if(fan==='Fan runs but temperature rises'){
+   extraCauses.push(['Fan operation alone does not explain the overheating','If the fan runs, verify it moves sufficient air and then investigate coolant level, pressure, radiator restriction, thermostat and circulation.']);
+   extraChecks.unshift('Do not replace the fan based only on the symptom. Verify airflow and fan speed, then perform cold-system pressure and circulation checks as appropriate.');
+  } else if(fan==='Fan runs intermittently / seems slow'){
+   extraCauses.push(['Intermittent or weak fan operation needs verification','Fan speed, control command, electrical supply and connections should be checked under the conditions when the temperature rises.']);
+   extraChecks.unshift('Use a scan tool/service procedure to compare fan command with actual operation; inspect the circuit before replacing components.');
+  } else {
+   extraChecks.unshift('Fan operation is not yet known. Have it checked safely with the correct procedure; do not reach near a fan or belts while the engine is running.');
+  }
+  if(coolant==='Below MIN / nearly empty'||coolant==='I can see a leak'){
+   extraCauses.push(['Coolant loss is a priority finding','Low coolant or a visible leak can cause overheating. The source of any loss must be found; topping up alone may not resolve it.']);
+   extraChecks.unshift('Do not run the engine if coolant is very low or a leak is significant. Once fully cold, inspect for leaks and arrange a pressure test/repair before normal driving.');
+  } else if(coolant==='At the correct level'){
+   extraChecks.push('A correct cold coolant level does not rule out trapped air, a pressure leak, thermostat/radiator restriction or pump problems; continue with proper pressure and circulation tests.');
+  } else {
+   extraChecks.push('Check the reservoir level only after the engine is completely cold. If you cannot safely confirm it, have a technician inspect it.');
+  }
+ }
+}
+if(d.symptom==='No start'){
+ const a0=a[0]||'';
+ if(a0==='No crank / silence'||a0==='One click or repeated clicks'||a0==='Cranks slowly'){
+  extraCauses.push(['Starting circuit / battery path first','The engine is not cranking normally, so begin with battery condition, terminal connections, grounds and starter control before fuel or spark testing.']);
+  extraChecks.unshift('Check battery state and terminals, then test voltage drop and starter command using the vehicle wiring diagram. Do not replace the starter based only on a click.');
+ } else if(a0==='Cranks normally but will not start'){
+  extraCauses.push(['Crank-no-start path','Since the engine cranks, next checks typically include stored codes, immobilizer status, engine RPM signal while cranking, fuel delivery and spark/injector control.']);
+  extraChecks.unshift('Read and save all relevant codes and freeze-frame data. Use model-specific procedures to verify RPM signal, fuel pressure and ignition; avoid spraying starting fluid into the intake.');
+ }
+}
+if(d.symptom==='Rough idle'){
+ const a0=a[0]||'',a2=a[2]||'';
+ if(a2==='Flashing'){
+  extraCauses.push(['Possible active misfire — protect the catalytic converter','A flashing check-engine light with rough running can indicate a catalyst-damaging misfire.']);
+  extraChecks.unshift('Avoid driving under load; stop if shaking is severe. Retrieve codes and freeze-frame data before clearing faults.');
+ }
+ if(a0==='RPM rises and falls'){
+  extraChecks.unshift('Check for intake/vacuum leaks and compare live fuel trims and idle data with service specifications before replacing sensors.');
+ }
+}
+if(d.symptom==='Low power'&&(a[2]||'')==='Flashing'){
+ extraCauses.push(['Possible active misfire','A flashing check-engine light can indicate a catalyst-damaging misfire, especially if the engine stumbles.']);
+ extraChecks.unshift('Avoid hard acceleration and stop driving if the engine runs very roughly. Save diagnostic codes and freeze-frame data.');
+}
+if(d.symptom==='Smoke or smell'){
+ const a0=a[0]||'';
+ if(a0==='Fuel smell'||a0==='Electrical / plastic burning smell'||a0==='Smoke from engine bay'){
+  extraCauses.push(['Safety takes priority over diagnosis','This answer may indicate a fire or fuel-leak risk. Do not continue running the engine to reproduce the symptom.']);
+  extraChecks.unshift('Switch off safely, keep away from smoke/fuel vapour and do not restart. If there is active smoke or fire risk, move away and call emergency/roadside assistance.');
+ }
+}
+r.causes=extraCauses.concat(r.causes);
+r.checks=extraChecks.concat(r.checks);
+return r;
+}
+function finishDiagnosis(){const d=lastCase;if(!d)return;const evidence=diagnosticQuestions.map((q,i)=>q.title+': '+(diagnosticAnswers[i]||'Not answered'));const r=tailorAssessment(d,build(d));
 $('title').textContent=[d.year==='Other'?'':d.year,d.make,d.model,d.engine==='Unknown'?'':d.engine].filter(Boolean).join(' ')||'Vehicle diagnosis';
-$('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. '+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied; symptom-based checks are shown.');
+$('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. Assessment adjusted to your answers below. '+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied; symptom-based checks are shown.');
 $('causes').innerHTML=r.causes.map(([a,b])=>'<div class="cause"><strong>'+escapeHTML(a)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('');
 $('checks').innerHTML=r.checks.map((x,i)=>'<div class="step"><b>STEP '+(i+1)+'</b><p>'+escapeHTML(x)+'</p></div>').join('');
 $('codeInfo').innerHTML=d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks.';
