@@ -86,76 +86,130 @@ base.push({title:'When is it most noticeable?',options:['At idle / stopped','Whi
 function renderQuestion(){const q=diagnosticQuestions[questionIndex];$('questionProgress').textContent='DIAGNOSTIC QUESTION '+(questionIndex+1)+' OF '+diagnosticQuestions.length;$('questionTitle').textContent=q.title;$('questionHelp').textContent=q.help||'Choose the closest answer. “Not sure” is a valid answer.';$('questionSafety').textContent=q.safety||'';$('questionOptions').innerHTML=q.options.map(o=>'<label class="symptom"><input type="radio" name="diagAnswer" value="'+escapeHTML(o)+'" '+(diagnosticAnswers[questionIndex]===o?'checked':'')+'>'+escapeHTML(o)+'</label>').join('');$('questionBack').textContent=questionIndex===0?'← Back to answers':'← Previous question';$('questionNext').textContent=questionIndex===diagnosticQuestions.length-1?'Build assessment →':'Next question →';}
 function runDiagnosis(){const d=getCase();if(!d.symptom){alert('Choose the main problem first.');showStep('symptomStep');return;}lastCase=d;diagnosticQuestions=questionsFor(d);questionIndex=0;diagnosticAnswers=[];renderQuestion();showPage('interactiveStep');}
 function tailorAssessment(d,r){
-const a=diagnosticAnswers, extraCauses=[], extraChecks=[];let urgent='';
-if(d.symptom==='Overheating'){
- const danger=a[0]||'',when=a[1]||'',fan=a[2]||'',coolant=a[3]||'';
- if(danger.startsWith('Yes')){
-  urgent='STOP ENGINE: You reported a red temperature gauge, warning, or steam. If this describes the vehicle now or happened during this drive, stop safely, switch off, and do not restart to test it. Never open a hot cooling system. Arrange recovery if overheating persists or steam is present.';
-  extraCauses.push(['Urgent overheating condition reported','The reported warning is more important than diagnosing a component. Continuing to run an overheating engine can cause severe damage.']);
-  extraChecks.unshift('Stop safely and switch off. Let the engine cool fully. Do not open the radiator/coolant reservoir while hot; do not continue running tests. If the warning returns, coolant is low, or steam is visible, arrange recovery and a cooling-system inspection.');
- } else {
-  if(when==='Mostly stopped or idling'||when==='In slow traffic'){
-   extraCauses.push(['Low-speed airflow / fan control is a priority to verify','The temperature rises mainly at low speed. Check fan command and actual operation, fan speeds, fuses, relays, wiring and airflow. This pattern suggests a direction for testing, not proof the fan is faulty.']);
-   extraChecks.unshift('Verify fan operation and commanded speeds using vehicle-specific service information. Keep hands, clothing and tools clear; electric fans can start unexpectedly.');
-  } else if(when==='At highway speed too'||when==='Both stopped and moving'){
-   extraCauses.push(['Cooling capacity or circulation needs checking','Overheating while moving as well as stopped means coolant level/leaks, radiator flow, thermostat operation, water-pump circulation and system pressure need checking. Answers alone cannot identify a failed part.']);
-   extraChecks.unshift('With the engine fully cold, check coolant level and visible leaks. If level is correct, arrange a cooling-system pressure test and appropriate circulation/radiator checks.');
+  const a=diagnosticAnswers, extraCauses=[], extraChecks=[];
+  let urgent=null, suppressRoutine=false;
+
+  // Critical safety states take priority over routine diagnostic branching.
+  if(d.symptom==='Overheating' && (a[0]||'').startsWith('Yes')){
+    urgent={
+      title:'STOP — overheating danger reported',
+      message:'You reported a red temperature gauge, a temperature warning, or steam. If this is happening now, stop safely, switch the engine off, and do not restart it to test. Never open a hot cooling system.',
+      action:'Let the engine cool completely. Do not continue diagnostic tests or drive it to “see if it improves.” Arrange recovery if the warning occurred, the gauge reached red, steam appeared, or overheating returns.'
+    };
+    extraCauses.push(['Immediate overheating risk','The reported danger-zone sign takes priority over identifying a component. Continued operation can cause severe engine damage.']);
+    extraChecks.push('After the engine is fully cold, a technician can check coolant level and leaks, then follow vehicle-specific pressure, fan, radiator-flow and circulation tests. Do not perform hot-system checks.');
+    suppressRoutine=true;
+  } else if(d.symptom==='Overheating'){
+    const when=a[1]||'',fan=a[2]||'',coolant=a[3]||'';
+    if(when==='Mostly stopped or idling'||when==='In slow traffic'){
+      extraCauses.push(['Low-speed airflow / fan control is a priority to verify','The symptom is strongest at low speed. Check fan command and actual operation, fan speeds, power supply, relays, wiring and airflow. This pattern does not prove the fan is faulty.']);
+      extraChecks.push('With the vehicle safely parked and using the model-specific procedure, compare commanded fan operation with actual fan operation. Keep hands, clothing and tools clear; electric fans can start unexpectedly.');
+    } else if(when==='At highway speed too'||when==='Both stopped and moving'){
+      extraCauses.push(['Cooling capacity or coolant circulation needs checking','Overheating while moving too makes coolant level/leaks, radiator flow, thermostat operation, water-pump circulation and system pressure important checks. The answers cannot identify a failed part by themselves.']);
+      extraChecks.push('When fully cold, check coolant level and visible leaks. If these are normal, arrange a cooling-system pressure test and appropriate radiator/circulation checks using service information.');
+    } else {
+      extraChecks.push('First record when the temperature rises and confirm the cold coolant level. Do not run the engine just to reproduce overheating.');
+    }
+    if(fan==='Fan does not run'){
+      extraCauses.push(['Fan circuit needs testing','A fan that does not run when expected may involve its motor, power, ground, fuse, relay, wiring, control command or temperature input.']);
+      extraChecks.push('Test fan power, ground, fuses/relays and control command before replacing any part.');
+    } else if(fan==='Fan runs but temperature rises'){
+      extraCauses.push(['Fan operation does not rule out other cooling faults','Since the fan reportedly runs, verify its speed and airflow, then investigate coolant level, pressure, radiator restriction, thermostat and circulation as appropriate.']);
+      extraChecks.push('Do not replace the fan based on this answer alone. Verify airflow and continue with pressure/flow tests according to service information.');
+    } else if(fan==='Fan runs intermittently / seems slow'){
+      extraCauses.push(['Intermittent or weak fan operation needs verification','Fan speed, control command, electrical supply and connections should be checked under the conditions when the temperature rises.']);
+      extraChecks.push('Compare commanded fan operation with actual operation and inspect the circuit before replacing parts.');
+    } else {
+      extraChecks.push('Fan operation remains unconfirmed. Have it checked with the correct procedure; never reach near a fan or belt while the engine is running.');
+    }
+    if(coolant==='Below MIN / nearly empty'||coolant==='I can see a leak'){
+      extraCauses.push(['Coolant loss is a priority finding','Low coolant or a visible leak can cause overheating. The source of coolant loss must be identified; topping up alone may not solve it.']);
+      extraChecks.push('If coolant is very low or leaking significantly, do not run the engine. Once fully cold, arrange leak diagnosis and repair before normal driving.');
+    } else if(coolant==='At the correct level'){
+      extraChecks.push('A correct cold coolant level does not rule out pressure loss, trapped air, radiator restriction, thermostat problems or a water-pump issue.');
+    } else {
+      extraChecks.push('Check the reservoir only after the engine is completely cold. If you cannot safely confirm the level, have a technician inspect it.');
+    }
   }
-  if(fan==='Fan does not run'){
-   extraCauses.push(['Fan operation not confirmed','A fan that does not run when expected may have a motor, power, ground, relay, wiring, control or temperature-input issue.']);
-   extraChecks.unshift('Test power, ground, fuses/relays, control command and fan operation before replacing a component.');
-  } else if(fan==='Fan runs but temperature rises'){
-   extraCauses.push(['Fan running does not rule out other cooling faults','Verify fan speed and airflow, then investigate coolant level, pressure, radiator restriction, thermostat and circulation as appropriate.']);
-   extraChecks.unshift('Do not replace the fan based only on this symptom. Confirm airflow and fan speed, then follow the service procedure for pressure and circulation checks.');
-  } else if(fan==='Fan runs intermittently / seems slow'){
-   extraCauses.push(['Intermittent / weak fan operation needs verification','Fan speed, control command, electrical supply and connections should be checked under the conditions when temperature rises.']);
-   extraChecks.unshift('Compare commanded fan operation with actual operation and inspect the circuit before replacing parts.');
+
+  if(d.symptom==='No start'){
+    const a0=a[0]||'';
+    if(['No crank / silence','One click or repeated clicks','Cranks slowly'].includes(a0)){
+      extraCauses.push(['Starting circuit / battery path first','The engine is not cranking normally, so start with battery condition, terminals, grounds and starter control before fuel or spark testing.']);
+      extraChecks.push('Check battery state and terminals, then test voltage drop and starter command using the vehicle wiring diagram. A click alone does not prove the starter has failed.');
+    } else if(a0==='Cranks normally but will not start'){
+      extraCauses.push(['Crank-no-start path','Since the engine cranks, checks typically include stored codes, immobilizer status, engine RPM signal while cranking, fuel delivery and spark/injector control.']);
+      extraChecks.push('Read and save codes and freeze-frame data. Use model-specific procedures to verify RPM signal, fuel pressure and ignition; avoid unsafe starting-fluid shortcuts.');
+    }
+  }
+  if(d.symptom==='Rough idle' && (a[2]||'')==='Flashing'){
+    extraCauses.push(['Possible active misfire — protect the catalytic converter','A flashing check-engine light with rough running can indicate a catalyst-damaging misfire.']);
+    extraChecks.push('Avoid driving under load; stop if shaking is severe. Retrieve codes and freeze-frame data before clearing faults.');
+  }
+  if(d.symptom==='Rough idle' && (a[0]||'')==='RPM rises and falls'){
+    extraChecks.push('Check for intake/vacuum leaks and compare live fuel trims and idle data with vehicle service specifications before replacing sensors.');
+  }
+  if(d.symptom==='Low power' && (a[2]||'')==='Flashing'){
+    extraCauses.push(['Possible active misfire','A flashing check-engine light can indicate a catalyst-damaging misfire, especially if the engine stumbles.']);
+    extraChecks.push('Avoid hard acceleration and stop driving if the engine runs very roughly. Save codes and freeze-frame data.');
+  }
+  if(d.symptom==='Smoke or smell' && ['Fuel smell','Electrical / plastic burning smell','Smoke from engine bay'].includes(a[0]||'')){
+    urgent={
+      title:'SAFETY — possible fire or leak risk',
+      message:'You reported smoke, fuel smell, or an electrical burning smell. Do not keep the engine running to reproduce it.',
+      action:'Switch off if safe, move away from smoke or fuel vapour, and arrange professional/roadside help. If there is fire or immediate danger, contact emergency services.'
+    };
+    extraCauses.push(['Potential fire / leak risk','Treat this as a safety issue before attempting diagnosis.']);
+    extraChecks.push('Do not restart the vehicle to test it. Keep away from smoke and fuel vapour and arrange professional inspection.');
+    suppressRoutine=true;
+  }
+  if(d.symptom==='Warning light' && (a[0]||'')==='Oil pressure'){
+    urgent={
+      title:'STOP ENGINE — oil-pressure warning',
+      message:'An oil-pressure warning while the engine is running can indicate loss of lubrication. Switch off safely and do not restart until the cause has been assessed.',
+      action:'Do not keep the engine running to see whether the warning clears. Arrange assistance if the warning occurred while running.'
+    };
+    extraCauses.push(['Potential loss of engine lubrication','The warning must be treated as urgent; the indicator alone does not identify the failed component.']);
+    extraChecks.push('Do not restart the engine. Check the oil level only when safely parked and according to the owner’s manual; arrange professional diagnosis.');
+    suppressRoutine=true;
+  }
+  if(d.symptom==='Warning light' && (a[0]||'')==='Temperature'){
+    urgent={
+      title:'STOP SAFELY — temperature warning',
+      message:'If the temperature warning is active, stop safely and switch the engine off. Never open a hot cooling system.',
+      action:'Allow the engine to cool fully. Do not continue driving with an active temperature warning; arrange recovery if overheating persists.'
+    };
+    extraCauses.push(['Potential overheating condition','Protect the engine before attempting further diagnosis.']);
+    extraChecks.push('Only inspect coolant level after the engine is completely cold. Do not restart to reproduce the warning.');
+    suppressRoutine=true;
+  }
+
+  // Remove generic steps that would repeat or contradict the answer-specific plan.
+  if(suppressRoutine){
+    r.checks=[];
+    r.causes=extraCauses;
   } else {
-   extraChecks.unshift('Fan operation is not yet known. Have it checked with the correct procedure; never reach near a fan or belt while the engine is running.');
+    r.causes=extraCauses.concat(r.causes);
+    r.checks=extraChecks.concat(r.checks);
   }
-  if(coolant==='Below MIN / nearly empty'||coolant==='I can see a leak'){
-   extraCauses.push(['Coolant loss is a priority finding','Low coolant or a visible leak can cause overheating. The leak source must be found; topping up alone may not solve it.']);
-   extraChecks.unshift('Do not run the engine if coolant is very low or leaking significantly. Once fully cold, arrange leak diagnosis and repair before normal driving.');
-  } else if(coolant==='At the correct level'){
-   extraChecks.push('A correct cold coolant level does not rule out trapped air, pressure loss, radiator restriction, thermostat or pump problems.');
-  } else {
-   extraChecks.push('Check the reservoir only when fully cold. If you cannot safely confirm the level, have a technician inspect it.');
-  }
- }
+  return {result:r,urgent};
 }
-if(d.symptom==='No start'){
- const a0=a[0]||'';
- if(a0==='No crank / silence'||a0==='One click or repeated clicks'||a0==='Cranks slowly'){
-  extraCauses.push(['Starting circuit / battery path first','The engine is not cranking normally, so start with battery condition, terminals, grounds and starter control before fuel or spark testing.']);
-  extraChecks.unshift('Check battery state and terminals, then test voltage drop and starter command using the vehicle wiring diagram. A click alone does not prove the starter has failed.');
- } else if(a0==='Cranks normally but will not start'){
-  extraCauses.push(['Crank-no-start path','Since the engine cranks, checks typically include codes, immobilizer status, RPM signal while cranking, fuel delivery and spark/injector control.']);
-  extraChecks.unshift('Read and save codes and freeze-frame data. Use model-specific procedures to verify RPM signal, fuel pressure and ignition; avoid starting-fluid shortcuts.');
- }
+function finishDiagnosis(){
+  const d=lastCase;if(!d)return;
+  const evidence=diagnosticQuestions.map((q,i)=>q.title+': '+(diagnosticAnswers[i]||'Not answered'));
+  const tailored=tailorAssessment(d,build(d)),r=tailored.result;
+  $('urgentBox').innerHTML=tailored.urgent
+    ?'<div class="alert" role="alert"><div class="eyebrow">SAFETY PRIORITY</div><h2>'+escapeHTML(tailored.urgent.title)+'</h2><p>'+escapeHTML(tailored.urgent.message)+'</p><p><strong>What to do:</strong> '+escapeHTML(tailored.urgent.action)+'</p></div>'
+    :'';
+  $('title').textContent=[d.year==='Other'?'':d.year,d.make,d.model,d.engine==='Unknown'?'':d.engine].filter(Boolean).join(' ')||'Vehicle diagnosis';
+  $('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. Guidance is prioritized using your answers. '+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied; symptom-based checks are shown.');
+  $('causes').innerHTML=r.causes.map(([a,b])=>'<div class="cause"><strong>'+escapeHTML(a)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('');
+  $('checks').innerHTML=r.checks.map((x,i)=>'<div class="step"><b>STEP '+(i+1)+'</b><p>'+escapeHTML(x)+'</p></div>').join('');
+  if(!r.checks.length)$('checks').innerHTML='<div class="notice">No routine checks are shown because the reported condition requires a safety-first response. Follow the warning above before further diagnosis.</div>';
+  $('codeInfo').innerHTML=d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks when the vehicle is safe.';
+  $('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('');
+  showPage('report');
 }
-if(d.symptom==='Rough idle'){
- if((a[2]||'')==='Flashing'){extraCauses.push(['Possible active misfire — protect the catalytic converter','A flashing check-engine light with rough running can indicate a catalyst-damaging misfire.']);extraChecks.unshift('Avoid driving under load; stop if shaking is severe. Retrieve codes and freeze-frame data before clearing faults.');}
- if((a[0]||'')==='RPM rises and falls')extraChecks.unshift('Check for intake/vacuum leaks and compare live fuel trims and idle data with service specifications before replacing sensors.');
-}
-if(d.symptom==='Low power'&&(a[2]||'')==='Flashing'){extraCauses.push(['Possible active misfire','A flashing check-engine light can indicate a catalyst-damaging misfire, especially if the engine stumbles.']);extraChecks.unshift('Avoid hard acceleration and stop driving if the engine runs very roughly. Save codes and freeze-frame data.');}
-if(d.symptom==='Smoke or smell'){
- const a0=a[0]||'';
- if(['Fuel smell','Electrical / plastic burning smell','Smoke from engine bay'].includes(a0)){urgent='SAFETY WARNING: You reported smoke, fuel smell, or an electrical burning smell. Do not keep the engine running to reproduce it. Switch off if safe, move away, and seek roadside/professional help; if fire is present, contact emergency services.';extraCauses.push(['Potential fire / leak risk','This symptom should be treated as a safety issue before attempting diagnosis.']);extraChecks.unshift('Do not restart the vehicle to test it. Keep away from smoke and fuel vapour and arrange professional inspection.');}
-}
-if(d.symptom==='Warning light'){
- if((a[0]||'')==='Oil pressure'){urgent='STOP ENGINE: An oil-pressure warning while the engine is running can indicate loss of lubrication. Switch off safely and do not restart until the oil level and cause have been assessed.';extraChecks.unshift('Do not keep the engine running to see whether the warning clears. Check oil level only when safely parked and follow the vehicle manual; arrange assistance if the warning occurred while running.');}
- if((a[0]||'')==='Temperature'){urgent='TEMPERATURE WARNING: Stop safely and switch off if the warning is active. Never open a hot cooling system. Arrange recovery if overheating persists.';extraChecks.unshift('Do not continue driving with an active temperature warning. Allow full cooling before any coolant-level inspection.');}
-}
-r.causes=extraCauses.concat(r.causes);r.checks=extraChecks.concat(r.checks);return {result:r,urgent};
-}
-function finishDiagnosis(){const d=lastCase;if(!d)return;const evidence=diagnosticQuestions.map((q,i)=>q.title+': '+(diagnosticAnswers[i]||'Not answered'));const tailored=tailorAssessment(d,build(d)),r=tailored.result;
-$('urgentBox').innerHTML=tailored.urgent?'<div class="alert" role="alert"><div class="eyebrow">SAFETY PRIORITY</div><h2>Stop and make the vehicle safe</h2><p>'+escapeHTML(tailored.urgent)+'</p></div>':'';
-$('title').textContent=[d.year==='Other'?'':d.year,d.make,d.model,d.engine==='Unknown'?'':d.engine].filter(Boolean).join(' ')||'Vehicle diagnosis';
-$('intro').textContent='Preliminary assessment only — not a confirmed diagnosis. Main symptom: '+d.symptom+'. Initial timing: '+d.when+'. The guidance below is prioritized using your answers. '+(d.codes.length?'Codes supplied: '+d.codes.join(', ')+'.':'No fault codes supplied; symptom-based checks are shown.');
-$('causes').innerHTML=r.causes.map(([a,b])=>'<div class="cause"><strong>'+escapeHTML(a)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('');
-$('checks').innerHTML=r.checks.map((x,i)=>'<div class="step"><b>STEP '+(i+1)+'</b><p>'+escapeHTML(x)+'</p></div>').join('');
-$('codeInfo').innerHTML=d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks.';
-$('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('');showPage('report');}
 function historyItems(){try{return JSON.parse(localStorage.getItem('garageDxCases')||'[]')}catch(e){return[];}}
 function updateCount(){$('count').textContent=historyItems().length;}
 function renderHistory(){const items=historyItems();$('historyList').innerHTML=items.length?items.map(x=>'<div class="cause"><strong>'+escapeHTML([x.year,x.make,x.model].filter(Boolean).join(' ')||'Vehicle case')+'</strong><p>'+escapeHTML(x.symptom||'No symptom')+' · '+escapeHTML(x.when||'')+' · '+escapeHTML(x.created||'')+'</p><p>Codes: '+escapeHTML((x.codes||[]).join(', ')||'None entered')+'</p></div>').join(''):'No saved cases yet.';showPage('history');}
