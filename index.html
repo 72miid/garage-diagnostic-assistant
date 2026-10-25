@@ -18,7 +18,7 @@
 </style>
 </head>
 <body><div class="app">
-<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE · BUILD 9</small></div></header>
+<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE · BUILD 10</small></div></header>
 <section class="hero"><div class="eyebrow">DIAGNOSE WITH CONFIDENCE</div><h2>Tell me what the car is doing.</h2><p class="muted">Answer one question at a time. The report uses your answers to prioritize safe next checks.</p><div class="mode"><button class="btn primary active" id="easy" type="button">Easy mode</button><button class="btn" id="pro" type="button">Workshop mode</button></div></section>
 <div class="row" style="margin:12px 0"><button class="btn" id="new" type="button">＋ New diagnosis</button><button class="btn" id="historyBtn" type="button">Case history (<span id="count">0</span>)</button></div>
 <section id="formArea">
@@ -37,8 +37,8 @@
 </section>
 <section id="interactiveStep" class="hidden"><div class="panel"><div class="eyebrow" id="questionProgress">DIAGNOSTIC QUESTION</div><h2 id="questionTitle">Let’s narrow it down.</h2><p class="muted" id="questionHelp"></p><div id="questionOptions" class="symptoms"></div><p class="help" id="questionSafety"></p><div class="row"><button class="btn" id="questionBack" type="button">← Back</button><button class="btn primary" id="questionNext" type="button">Next question →</button></div></div></section>
 <section id="report" class="hidden"><div id="urgentBox"></div><div class="result"><div class="eyebrow">FIRST ASSESSMENT</div><h2 id="title"></h2><p id="intro"></p><span class="tag">Preliminary guidance — not a confirmed diagnosis</span></div><div class="panel"><h3>What the evidence may suggest</h3><div id="causes"></div></div><div class="panel"><h3>Your next checks</h3><div id="checks"></div></div><div class="panel"><h3>Code interpretation</h3><div id="codeInfo"></div><p class="help">Code status (stored, pending, permanent) must be read from a compatible scanner; it cannot be determined from the code number alone.</p></div><div class="panel"><h3>Your answers</h3><div id="answerSummary"></div></div><div class="row"><button class="btn primary" id="save" type="button">Save case</button><button class="btn" id="back" type="button">Edit answers</button><button class="btn" id="print" type="button">Print report</button></div></section>
-<section id="history" class="hidden"><div class="panel"><h3>Saved cases</h3><div id="historyList" class="muted">No saved cases yet.</div><div class="row"><button class="btn" id="historyBack" type="button">Back to diagnosis</button><button class="btn" id="export" type="button">Export history</button></div></div></section>
-<div class="foot">Prototype · BUILD 9. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
+<section id="history" class="hidden"><div class="panel"><h3>Saved cases</h3><p class="help">Open a case to review its stored answers, vehicle details, codes and manually entered data. Older saved cases may not contain every field.</p><div id="historyList" class="muted">No saved cases yet.</div><div class="row"><button class="btn" id="historyBack" type="button">Back to diagnosis</button><button class="btn" id="export" type="button">Export history</button></div></div></section>
+<div class="foot">Prototype · BUILD 10. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
 <script>
 (()=>{
 'use strict';
@@ -265,9 +265,33 @@ function finishDiagnosis(){
     (live.length?'<div class="cause"><strong>Workshop live-data entries</strong><p>'+live.map(([k,v])=>escapeHTML(liveLabel[k]||k)+': '+escapeHTML(v)).join('<br>')+'</p><p class="help">These manually entered values are shown for reference; this prototype does not automatically validate or interpret them.</p></div>':'');
   showPage('report');
 }
-function historyItems(){try{return JSON.parse(localStorage.getItem('garageDxCases')||'[]')}catch(e){return[];}}
+function historyItems(){try{return JSON.parse(localStorage.getItem('garageDxCases')||'[]')}catch(e){return[]}}
 function updateCount(){$('count').textContent=historyItems().length;}
-function renderHistory(){const items=historyItems();$('historyList').innerHTML=items.length?items.map(x=>'<div class="cause"><strong>'+escapeHTML([x.year,x.make,x.model].filter(Boolean).join(' ')||'Vehicle case')+'</strong><p>'+escapeHTML(x.symptom||'No symptom')+' · '+escapeHTML(x.when||'')+' · '+escapeHTML(x.created||'')+'</p><p>Codes: '+escapeHTML((x.codes||[]).join(', ')||'None entered')+'</p></div>').join(''):'No saved cases yet.';showPage('history');}
+function formatSavedDate(value){
+  if(!value)return 'Date unavailable';
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime()))return String(value);
+  return date.toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});
+}
+function renderHistory(){
+  const items=historyItems();
+  $('historyList').innerHTML=items.length?items.map((x,index)=>{
+    const vehicle=[x.year,x.make,x.model,x.engine].filter(v=>v&&v!=='Unknown'&&v!=='Other').join(' ');
+    const answers=Array.isArray(x.diagnosticAnswers)?x.diagnosticAnswers:[];
+    const answerMarkup=answers.length
+      ?'<div class="cause"><strong>Diagnostic answers</strong>'+answers.map((a,i)=>'<p><strong>Q'+(i+1)+':</strong> '+escapeHTML(a.question||'Question')+'<br><strong>Answer:</strong> '+escapeHTML(a.answer||'Not answered')+'</p>').join('')+'</div>'
+      :'<div class="cause"><strong>Diagnostic answers</strong><p>Answers were not stored for this older case.</p></div>';
+    const live=x.liveData||{};
+    const liveLabels={ect:'Coolant temperature (°C)',rpm:'Engine RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)'};
+    const liveValues=Object.entries(live).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);
+    const liveMarkup=liveValues.length
+      ?'<div class="cause"><strong>Manually entered live data</strong><p>'+liveValues.map(([k,v])=>escapeHTML(liveLabels[k]||k)+': '+escapeHTML(v)).join('<br>')+'</p><p class="help">Reference only; this prototype does not automatically validate or interpret these values.</p></div>'
+      :'<div class="cause"><strong>Live data</strong><p>No values entered.</p></div>';
+    const codeText=(x.codes||[]).length?(x.codes||[]).map(c=>c+': '+codeDescription(c)).join(' · '):'No codes were entered for this case.';
+    return '<details class="cause" style="margin-bottom:12px"><summary><strong>'+escapeHTML(vehicle||'Vehicle case')+'</strong><p>'+escapeHTML(x.symptom||'No symptom')+' · '+escapeHTML(formatSavedDate(x.created))+'</p><p>Codes: '+escapeHTML((x.codes||[]).join(', ')||'None entered')+'</p></summary><div style="margin-top:14px"><p><strong>Initial timing:</strong> '+escapeHTML(x.when||'Not specified')+'</p><p><strong>Scanner:</strong> '+escapeHTML(x.scanner||'Not specified')+'</p>'+answerMarkup+liveMarkup+'<div class="cause"><strong>Code interpretation</strong><p>'+escapeHTML(codeText)+'</p></div><p class="help">Saved case '+(index+1)+' of '+items.length+'. This record stores vehicle details and answers; it is not a confirmed diagnosis.</p></div></details>';
+  }).join(''):'No saved cases yet.';
+  showPage('history');
+}
 $('toSymptoms').addEventListener('click',()=>showStep('symptomStep'));
 $('backCar').addEventListener('click',()=>showStep('carStep'));
 $('toScanner').addEventListener('click',()=>{if(!checked('mainSymptom')){alert('Choose the main problem first.');return;}showStep('scannerStep');});
@@ -289,7 +313,18 @@ $('back').addEventListener('click',()=>{
 });
 $('historyBack').addEventListener('click',()=>showPage('formArea'));$('historyBtn').addEventListener('click',renderHistory);
 $('print').addEventListener('click',()=>window.print());
-$('save').addEventListener('click',()=>{if(!lastCase)return;const a=historyItems();a.unshift({...lastCase,diagnosticAnswers:diagnosticQuestions.map((q,i)=>({question:q.title,answer:diagnosticAnswers[i]||''})),id:Date.now()});try{localStorage.setItem('garageDxCases',JSON.stringify(a.slice(0,50)));updateCount();$('save').textContent='Saved ✓';}catch(e){alert('Unable to save on this browser. You can still print the report.');}});
+$('save').addEventListener('click',()=>{
+  if(!lastCase)return;
+  const a=historyItems();
+  const answers=diagnosticQuestions.map((q,i)=>({question:q.title,answer:diagnosticAnswers[i]||''}));
+  const record={...lastCase,diagnosticAnswers:answers,id:Date.now(),savedAt:new Date().toISOString()};
+  a.unshift(record);
+  try{
+    localStorage.setItem('garageDxCases',JSON.stringify(a.slice(0,50)));
+    updateCount();
+    $('save').textContent='Saved ✓';
+  }catch(e){alert('Unable to save on this browser. You can still print the report.');}
+});
 $('export').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(historyItems(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='garage-diagnostic-cases.json';a.click();URL.revokeObjectURL(url);});
 updateCount();setMode('easy');
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

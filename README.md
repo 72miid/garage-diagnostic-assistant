@@ -22,3 +22,10 @@ Replace the repository-root `index.html`, `manifest.json`, `sw.js`, and `README.
 
 ## Limits
 This is a rules-based prototype, not a confirmed diagnostic system. It has no live OBD-II connection, does not clear codes, and cannot automatically interpret manually entered live data. Use manufacturer-specific service information and safe test procedures. Never open a hot pressurized cooling system. Stop safely for severe overheating, oil-pressure warnings, fuel leaks, smoke, or other immediate danger.
+
+
+## Build 10 — case history review
+- Case-history entries can be expanded to show stored diagnostic answers, initial timing, scanner status, codes, and manually entered live-data values.
+- Dates are formatted for the device's local timezone instead of displaying raw UTC timestamps.
+- Older saved cases remain readable; fields that were not stored are identified as unavailable.
+- This remains a rules-based prototype. History stores vehicle data and answers, not a reconstructed full diagnostic report.

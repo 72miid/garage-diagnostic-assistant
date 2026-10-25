@@ -26,3 +26,13 @@ The report must reflect selected answers and must not assert a failed part witho
 15. Save/history/export/print remain functional.
 16. Header/footer display BUILD 9 after deployment. If absent, the old page is still being served or cached.
 17. Workshop live-data entries appear in the report as reference-only, not as interpreted results.
+
+
+## Build 10 case-history acceptance tests
+1. Save a completed diagnosis and confirm the history count increases.
+2. Open Case history and expand the saved case.
+3. Confirm all diagnostic questions and selected answers are visible.
+4. Confirm vehicle, symptom, initial timing, scanner status and entered codes are shown.
+5. Enter sample workshop live-data values, save a case, and confirm values are shown as manual/reference-only.
+6. Confirm dates display in device-local format rather than a raw ISO UTC timestamp.
+7. Open an older case without diagnostic answers and confirm the page says answers were not stored instead of crashing.
