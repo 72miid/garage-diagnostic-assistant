@@ -62,10 +62,6 @@
 <div class="grid"><div class="field"><label>Coolant temperature (°C)</label><input id="ect" type="number" placeholder="e.g. 98"></div><div class="field"><label>RPM</label><input id="rpm" type="number" placeholder="e.g. 750"></div><div class="field"><label>STFT bank 1 (%)</label><input id="stft" type="number" placeholder="e.g. 3"></div><div class="field"><label>LTFT bank 1 (%)</label><input id="ltft" type="number" placeholder="e.g. 5"></div></div>
 </div>
 </section>
-<div class="hidden" aria-hidden="true">
-<input id="make"><input id="model"><input id="year"><input id="engine">
-<input id="complaint"><input id="when"><button id="analyze" type="button">Run analysis</button>
-</div>
 <section id="report" class="hidden"><div class="result"><div class="eyebrow">FIRST ASSESSMENT</div><h2 id="title"></h2><p id="intro"></p><span class="tag">Preliminary guidance — not a confirmed diagnosis</span></div><div class="panel"><h3>What the evidence may suggest</h3><div id="causes"></div></div><div class="panel"><h3>Your next checks</h3><div id="checks"></div></div><div class="panel"><h3>Code interpretation</h3><div id="codeInfo"></div><p class="help">Code status (stored, pending, permanent) must be read from a compatible scanner; it cannot be determined from the code number alone.</p></div><div class="row"><button class="btn primary" id="save">Save case</button><button class="btn" id="back">Edit answers</button><button class="btn" onclick="print()">Print report</button></div></section>
 <section id="history" class="hidden"><div class="panel"><h3>Saved cases</h3><div id="historyList" class="muted">No saved cases yet.</div><div class="row"><button class="btn" id="historyBack">Back to diagnosis</button><button class="btn" id="export">Export history</button></div></div></section>
 <div class="foot">Prototype only. No live OBD connection or code clearing is implemented yet. Save codes and freeze-frame data before clearing faults; never open a hot cooling system.</div></div>
@@ -93,16 +89,10 @@
  q('#backSymptoms').addEventListener('click',()=>show('symptomStep'));
  const diag=q('#diagnose');
  if(diag) diag.addEventListener('click',()=>{
-   const symptom=chosen('mainSymptom');
-   if(!symptom){alert('Choose the main problem first.');show('symptomStep');return;}
-   q('#make').value=chosen('makeChoice');
-   q('#model').value=chosen('modelChoice');
-   q('#year').value=chosen('yearChoice')==='Other'?'':chosen('yearChoice');
-   q('#engine').value=chosen('engineChoice')==='Unknown'?'':chosen('engineChoice');
-   q('#complaint').value=symptom;
-   q('#when').value=chosen('whenChoice');
-   q('#codes').value=(q('#codes').value||'').toUpperCase();
-   q('#analyze').click();
+   const codes=q('#codes');const oldCodes=q('#dtc');
+   if(oldCodes && codes) oldCodes.value=codes.value;
+   if(document.getElementById('complaint') && !document.getElementById('complaint').value)
+     document.getElementById('complaint').value=chosen('mainSymptom')+'; occurs: '+chosen('whenChoice');
  });
  const newBtn=q('#new');
  if(newBtn) newBtn.addEventListener('click',()=>show('carStep'));
@@ -134,6 +124,6 @@ function hist(){try{return JSON.parse(localStorage.getItem('garageDxCases')||'[]
 $('save').onclick=()=>{if(!last)return;let a=hist();a.unshift({...last,id:Date.now()});localStorage.setItem('garageDxCases',JSON.stringify(a.slice(0,50)));updateCount();$('save').textContent='Saved ✓'};
 $('historyBtn').onclick=()=>{let a=hist();$('historyList').innerHTML=a.length?a.map(x=>'<div class="cause"><strong>'+esc([x.year,x.make,x.model].filter(Boolean).join(' ')||'Vehicle case')+'</strong><p>'+esc(x.complaint||'No description')+' · '+new Date(x.created).toLocaleString()+'</p><p>Codes: '+esc(x.codes.join(', ')||'None entered')+'</p></div>').join(''):'No saved cases yet.';show('history')};
 $('export').onclick=()=>{let b=new Blob([JSON.stringify(hist(),null,2)],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='garage-diagnostic-cases.json';a.click();URL.revokeObjectURL(u)};
-$('clear').onclick=()=>{document.querySelectorAll('#formArea input,#formArea textarea').forEach(x=>{if(x.type==='checkbox')x.checked=false;else x.value=''});document.querySelectorAll('#formArea select').forEach(x=>x.selectedIndex=0);$('codeArea').classList.add('hidden');setMode('easy')};updateCount();setMode('easy');
+if($('clear'))$('clear').onclick=()=>{document.querySelectorAll('#formArea input,#formArea textarea').forEach(x=>{if(x.type==='checkbox'||x.type==='radio')x.checked=false;else x.value=''});document.querySelectorAll('#formArea select').forEach(x=>x.selectedIndex=0);$('codeArea').classList.add('hidden');setMode('easy')};updateCount();setMode('easy');
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script></body></html>
