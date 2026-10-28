@@ -36,3 +36,12 @@ The report must reflect selected answers and must not assert a failed part witho
 5. Enter sample workshop live-data values, save a case, and confirm values are shown as manual/reference-only.
 6. Confirm dates display in device-local format rather than a raw ISO UTC timestamp.
 7. Open an older case without diagnostic answers and confirm the page says answers were not stored instead of crashing.
+
+
+## Build 11 live-data interpretation tests
+1. Enter ECT 98, RPM 750, STFT 3, LTFT 5. Report should show all entries and cautious, contextual notes; it must not claim a failed part.
+2. Enter STFT 25 and LTFT 0. Report should flag a strongly shifted trim and request confirmation under appropriate operating conditions.
+3. Enter STFT 12 and LTFT 8. Report should describe notable positive combined correction and calculate approximately +20%, while emphasizing comparison with Bank 2 and confirming conditions.
+4. Enter ECT 120. Report should advise prompt verification and safe shutdown if actual overheating/warning is present.
+5. Leave all live-data fields blank. Report should not invent readings and should not display live-data interpretation.
+6. Verify service-worker cache name is v11 and header/footer show Build 11.
