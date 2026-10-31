@@ -38,10 +38,18 @@ The report must reflect selected answers and must not assert a failed part witho
 7. Open an older case without diagnostic answers and confirm the page says answers were not stored instead of crashing.
 
 
-## Build 11 live-data interpretation tests
+## Build 12 live-data interpretation tests
 1. Enter ECT 98, RPM 750, STFT 3, LTFT 5. Report should show all entries and cautious, contextual notes; it must not claim a failed part.
 2. Enter STFT 25 and LTFT 0. Report should flag a strongly shifted trim and request confirmation under appropriate operating conditions.
 3. Enter STFT 12 and LTFT 8. Report should describe notable positive combined correction and calculate approximately +20%, while emphasizing comparison with Bank 2 and confirming conditions.
 4. Enter ECT 120. Report should advise prompt verification and safe shutdown if actual overheating/warning is present.
 5. Leave all live-data fields blank. Report should not invent readings and should not display live-data interpretation.
-6. Verify service-worker cache name is v11 and header/footer show Build 11.
+6. Verify service-worker cache name is v11 and header/footer show Build 12.
+
+
+## Build 12 bank comparison tests
+- Enter Bank 1 STFT/LTFT and Bank 2 STFT/LTFT; verify all four appear in the report and saved history.
+- Use equal bank trims: no strong bank-specific conclusion should be made from equality alone.
+- Use a difference of at least 10 percentage points between banks: report should recommend confirming same operating conditions and bank-specific checks, not naming a failed part.
+- Verify missing Bank 2 values do not break analysis or older saved cases.
+- Verify new diagnosis clears both Bank 2 fields.
