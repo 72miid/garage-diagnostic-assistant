@@ -2,7 +2,9 @@
   "name": "Garage Diagnostic Assistant",
   "short_name": "Garage Dx",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#090e14",
-  "theme_color": "#0b1017"
+  "theme_color": "#0b1017",
+  "description": "Evidence-led preliminary diagnostic guidance for workshops."
 }

@@ -3,161 +3,186 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1017"><link rel="manifest" href="./manifest.json">
-<title>Garage Diagnostic Assistant — Build 15</title>
+<title>Garage Diagnostic Assistant — Build 15.1</title>
 <style>
-:root{color-scheme:dark;--bg:#090e14;--panel:#111923;--panel2:#192638;--line:#2a3a4f;--text:#f3f6fb;--muted:#9aabc0;--accent:#ffb454;--green:#66d5a4;--red:#ff7373}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
-header,main,footer{width:min(920px,100%);margin:auto;padding:18px}header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}
-h1{font-size:20px;line-height:1.2;margin:0}h2{font-size:19px;margin:4px 0 12px}h3{font-size:16px;margin:0 0 6px}
-small,.muted,.help{color:var(--muted)}.tag{color:var(--accent);font-weight:700;font-size:12px;letter-spacing:.08em}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-label{display:block;font-weight:600;margin:9px 0 5px}input,select,textarea{width:100%;background:#0b131e;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:11px;font:inherit}
-button{border:0;border-radius:10px;padding:12px 16px;background:var(--accent);color:#1b160e;font-weight:750;font-size:14px;cursor:pointer}
-button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button.danger{background:#572a31;color:#fff}
-.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.hidden{display:none!important}
-.choice{display:flex;gap:9px;align-items:flex-start;padding:9px;border:1px solid var(--line);border-radius:9px;margin:7px 0;font-weight:500}.choice input{width:auto;margin-top:5px}
-.alert{border:1px solid #a94b4b;background:#351b21;padding:13px;border-radius:11px}.good{border-color:#2c8563;background:#10291f}
-.step{border-left:3px solid var(--accent);padding:5px 0 7px 13px;margin:12px 0}.step b{color:var(--accent);font-size:12px}
-.pill{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--panel2);color:var(--muted);font-size:12px}
-hr{border:0;border-top:1px solid var(--line);margin:14px 0}details{border:1px solid var(--line);border-radius:10px;padding:12px;margin:9px 0}summary{cursor:pointer;font-weight:700}
-footer{text-align:center;color:var(--muted);font-size:12px}
-</style>
-</head>
-<body>
-<header><div><div class="tag">WORKSHOP DIAGNOSTIC PLATFORM</div><h1>Garage Diagnostic Assistant</h1><small>Evidence-led workflow · BUILD 15</small></div><button class="secondary" id="historyBtn">Case history</button></header>
-<main>
-<section id="start">
- <div class="card"><h2>New diagnostic case</h2><p class="muted">Enter what you know. “Unknown” is acceptable; the assistant will not invent missing measurements.</p>
- <div class="grid">
- <div><label>Make</label><input id="make" value="Dodge"></div><div><label>Model</label><input id="model" value="Charger R/T"></div>
- <div><label>Year</label><input id="year" type="number" value="2015"></div><div><label>Engine</label><input id="engine" value="5.7L HEMI V8"></div>
- </div>
- <label>Main symptom</label><select id="symptom"><option>Low power</option><option>Rough idle / misfire</option><option>Overheating</option><option>No start</option><option>Warning light</option><option>Smoke or burning smell</option><option>Electrical issue</option><option>Unusual noise</option></select>
- <label>When does it happen?</label><select id="when"><option>Not sure</option><option>Cold start</option><option>Warm idle</option><option>Acceleration / under load</option><option>At highway speed</option><option>Stopped / traffic</option><option>All the time</option><option>Intermittently</option></select>
- <label>OBD-II codes (optional; separate with spaces or commas)</label><input id="codes" placeholder="e.g. P0302 P0171">
- <div class="grid">
- <div><label>Scanner available?</label><select id="scanner"><option>Yes</option><option>No</option></select></div>
- <div><label>Engine fully warm?</label><select id="warm"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
- <div><label>Fuel system status</label><select id="loop"><option>Unknown</option><option>Closed loop</option><option>Open loop</option></select></div>
- </div>
- <div class="actions"><button id="startBtn">Start guided diagnosis</button><button class="secondary" id="resetBtn">Clear form</button></div>
- </div>
- <div class="card"><h3>Safety first</h3><p class="muted">If the oil-pressure warning is on, temperature is in the red, the engine is severely knocking, fuel is leaking, or smoke/electrical burning is present: stop safely, switch off and do not continue testing. Never open a hot cooling system.</p></div>
+:root{color-scheme:dark;--bg:#090e14;--panel:#121c28;--panel2:#1b293b;--line:#304158;--txt:#f3f6fb;--muted:#a8b6c8;--accent:#ffb454;--danger:#ff6868;--dangerbg:#3a1b20;--good:#8bd8ad}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 90% -10%,#20354a,transparent 42%),var(--bg);color:var(--txt);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:820px;margin:auto;padding:16px 13px 36px}header{display:flex;align-items:center;gap:12px;margin:6px 0 16px}.logo{background:var(--accent);color:#17120a;padding:10px 12px;border-radius:12px;font-weight:950;font-size:20px}h1{font-size:19px;margin:0}header small,.muted,.help{color:var(--muted)}header small{font-size:11px;letter-spacing:.1em}.hero,.panel,.result,.step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px}.hero{background:linear-gradient(145deg,#17283b,#111923)}.eyebrow{font-size:11px;letter-spacing:.13em;color:var(--accent);font-weight:900}h2{font-size:22px;line-height:1.25;margin:6px 0}h3{font-size:17px;margin:4px 0 10px}.row{display:flex;gap:8px;flex-wrap:wrap}.btn{background:var(--panel2);border:1px solid var(--line);border-radius:11px;color:var(--txt);font-weight:800;padding:11px 14px;min-height:44px;cursor:pointer}.btn.primary,.btn.active{background:var(--accent);color:#17120a;border-color:var(--accent)}.btn:disabled{opacity:.4}.mode{display:flex;gap:8px;margin-top:12px}.mode button{flex:1}.field{margin:12px 0}.field label{display:block;font-size:13px;color:#c4d0df;margin-bottom:5px}input,select,textarea{width:100%;background:#0b111a;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;min-height:43px}textarea{min-height:78px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.choice{display:flex!important;gap:8px;align-items:center;background:#0b111a;border:1px solid var(--line);border-radius:10px;padding:10px;min-height:46px}.choice input{width:19px;height:19px;min-height:19px;accent-color:var(--accent)}.hidden{display:none!important}.alert{background:var(--dangerbg);border:2px solid var(--danger);border-radius:13px;padding:14px;margin-bottom:12px}.alert h2,.alert .eyebrow{color:#ff9999}.notice{background:#182a25;border:1px solid #386a56;border-radius:11px;padding:12px;margin:10px 0}.cause{border-top:1px solid var(--line);padding:11px 0}.cause:first-child{border:0}.cause strong{display:block}.step b{font-size:11px;color:var(--accent)}.tag{display:inline-block;background:var(--panel2);padding:4px 8px;border-radius:7px;font-size:12px}.help{font-size:12px}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}details{border-top:1px solid var(--line);padding:10px 0}summary{cursor:pointer;font-weight:800}table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px 5px}td input{min-width:75px}.safe{color:var(--good)}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.choices{grid-template-columns:1fr 1fr}.app{padding:12px 10px 28px}}
+@media print{body{background:white;color:#111}.hero,.panel,.result,.step,.alert,.notice{background:white;color:#111;border-color:#bbb}.muted,.help{color:#444}.row,.mode,.logo{display:none!important}}
+</style></head>
+<body><main class="app">
+<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP GUIDANCE · BUILD 15.1</small></div></header>
+<section class="hero"><div class="eyebrow">EVIDENCE-LED DIAGNOSTICS</div><h2>Diagnose the fault. Test before replacing.</h2><p class="muted">Guided symptom questions, manual scanner readings and an ordered inspection plan. Preliminary guidance only.</p>
+<div class="mode"><button id="easyMode" class="btn primary active">Easy Mode</button><button id="proMode" class="btn">Workshop / Pro Mode</button></div></section>
+<div class="row" style="margin:12px 0"><button class="btn" id="newCase">＋ New case</button><button class="btn" id="historyBtn">Case history (<span id="caseCount">0</span>)</button></div>
+
+<section id="intake">
+<div class="panel" id="vehiclePanel"><div class="eyebrow">STEP 1 · VEHICLE</div><h3>Vehicle details</h3><div class="grid">
+<div class="field"><label>Make</label><input id="make" value="Dodge"></div><div class="field"><label>Model</label><input id="model" value="Charger R/T"></div>
+<div class="field"><label>Year</label><input id="year" type="number" value="2015"></div><div class="field"><label>Engine</label><input id="engine" value="5.7L V8 HEMI"></div>
+</div><button class="btn primary" id="toSymptoms">Continue →</button></div>
+
+<div class="panel hidden" id="symptomPanel"><div class="eyebrow">STEP 2 · SYMPTOM</div><h3>What is the main problem?</h3><div class="choices" id="symptomChoices">
+<label class="choice"><input type="radio" name="symptom" value="Overheating">Overheating</label>
+<label class="choice"><input type="radio" name="symptom" value="Low power">Low / uneven power</label>
+<label class="choice"><input type="radio" name="symptom" value="Rough idle / misfire">Rough idle / misfire</label>
+<label class="choice"><input type="radio" name="symptom" value="No start">No start</label>
+<label class="choice"><input type="radio" name="symptom" value="Warning light">Warning light</label>
+<label class="choice"><input type="radio" name="symptom" value="Smoke / smell">Smoke / burning smell</label>
+<label class="choice"><input type="radio" name="symptom" value="Electrical">Electrical issue</label>
+<label class="choice"><input type="radio" name="symptom" value="Noise">Unusual noise</label></div>
+<div class="field"><label>When does it happen?</label><select id="when"><option>All the time</option><option>Cold start</option><option>After warming up</option><option>At idle / stopped</option><option>During acceleration / load</option><option>At road speed</option><option>Intermittently</option></select></div>
+<div class="field"><label>Fault codes (comma-separated, optional)</label><input id="codes" placeholder="e.g. P0171, P0300"></div>
+<div class="field"><label>Scanner available?</label><select id="scanner"><option>Yes</option><option>No</option></select></div>
+<div class="row"><button class="btn" id="backVehicle">← Back</button><button class="btn primary" id="toLive">Continue →</button></div></div>
+
+<div class="panel hidden" id="livePanel"><div class="eyebrow">STEP 3 · WORKSHOP DATA</div><h3>Manual live-data readings</h3><p class="help">Enter values exactly as shown by your scanner. Leave unknown values blank. Fuel-trim interpretation requires a warm engine, closed loop and matching RPM/load conditions.</p>
+<div class="grid">
+<div class="field"><label>Coolant temperature ECT (°C)</label><input id="ect" type="number" step="0.1" placeholder="e.g. 92"></div>
+<div class="field"><label>Engine RPM</label><input id="rpm" type="number" step="1" placeholder="e.g. 750"></div>
+<div class="field"><label>STFT Bank 1 (%)</label><input id="stft1" type="number" step="0.1"></div>
+<div class="field"><label>LTFT Bank 1 (%)</label><input id="ltft1" type="number" step="0.1"></div>
+<div class="field"><label>STFT Bank 2 (%)</label><input id="stft2" type="number" step="0.1"></div>
+<div class="field"><label>LTFT Bank 2 (%)</label><input id="ltft2" type="number" step="0.1"></div>
+</div>
+<div class="grid"><div class="field"><label>Engine fully warmed?</label><select id="warm"><option value="Unknown">Unknown</option><option>Yes</option><option>No</option></select></div>
+<div class="field"><label>Fuel system status</label><select id="loop"><option value="Unknown">Unknown</option><option>Closed loop</option><option>Open loop</option></select></div>
+<div class="field"><label>Same RPM/load across banks?</label><select id="same"><option value="Unknown">Unknown</option><option>Yes</option><option>No</option></select></div>
+</div><div class="field"><label>Additional observations</label><textarea id="notes" placeholder="What did you see, hear or measure?"></textarea></div>
+<div class="row"><button class="btn" id="backSymptoms">← Back</button><button class="btn primary" id="startQuestions">Start guided questions →</button></div></div>
 </section>
-<section id="questions" class="hidden"><div class="card"><div class="tag" id="progress"></div><h2 id="qtitle"></h2><p class="muted" id="qhelp"></p><div id="qoptions"></div><div class="actions"><button class="secondary" id="prevQ">Back</button><button id="nextQ">Next</button></div></div></section>
-<section id="report" class="hidden"><div class="card"><div class="tag">DIAGNOSTIC ASSESSMENT</div><h2 id="reportTitle"></h2><p id="reportIntro" class="muted"></p><div id="safety"></div><h3>1. Most relevant findings</h3><div id="findings"></div><hr><h3>2. Test plan — follow in order</h3><div id="testplan"></div><hr><h3>3. Code interpretation and test paths</h3><div id="codeplans"></div><hr><h3>4. Data quality and limitations</h3><div id="limitations" class="muted"></div><div class="actions"><button id="saveBtn">Save case</button><button class="secondary" id="printBtn">Print report</button><button class="secondary" id="newBtn">New case</button></div></div></section>
-<section id="history" class="hidden"><div class="card"><h2>Saved cases</h2><div id="historyList"></div><div class="actions"><button class="secondary" id="backHome">Back</button><button class="danger" id="clearHistory">Delete all saved cases</button></div></div></section>
-</main><footer>Preliminary diagnostic guidance only. Verify vehicle-specific specifications and use approved service procedures. No live OBD connection is implemented.</footer>
+
+<section id="questions" class="panel hidden"><div class="eyebrow" id="qProgress">QUESTION</div><h3 id="qTitle"></h3><p class="help" id="qHelp"></p><div class="choices" id="qOptions"></div><div class="row" style="margin-top:13px"><button class="btn" id="prevQ">← Back</button><button class="btn primary" id="nextQ">Next →</button></div></section>
+
+<section id="report" class="hidden">
+<div id="urgent"></div><div class="panel"><div class="eyebrow">DIAGNOSTIC REPORT · BUILD 15.1</div><h2 id="reportTitle"></h2><p class="muted" id="reportIntro"></p><div id="findings"></div></div>
+<div class="panel"><h3>Prioritized inspection plan</h3><div id="testPlan"></div></div>
+<div class="panel"><h3>Fault-code guidance</h3><div id="codePlans"></div></div>
+<div class="panel"><h3>Live-data analysis</h3><div id="liveAnalysis"></div></div>
+<div class="panel"><h3>Evidence and limitations</h3><div id="evidence"></div><p class="help">This app does not connect to an ECU, validate PIDs, decode VINs or access an OEM database. Confirm units, wiring diagrams, thresholds and procedures using service information for the exact vehicle. Never replace a part based only on a DTC.</p></div>
+<div class="row"><button class="btn primary" id="saveCase">Save case</button><button class="btn" id="printReport">Print report</button><button class="btn" id="editCase">← Edit case</button></div>
+</section>
+<section id="history" class="panel hidden"><div class="eyebrow">LOCAL CASE STORAGE</div><h3>Saved cases</h3><div id="historyList"></div><div class="row"><button class="btn" id="exportHistory">Export JSON</button><button class="btn" id="clearHistory">Clear history</button><button class="btn" id="backHistory">← Back</button></div><p class="help">Cases are stored only in this browser/device.</p></section>
+<div class="footer">Preliminary diagnostic guidance · No live OBD connection · Verify before repair</div>
+</main>
 <script>
+(()=>{
+'use strict';
 const $=id=>document.getElementById(id);
-let questions=[],answers=[],qi=0,current=null,lastReport=null;
-const DB='garageDxBuild15Cases';
-const codeRx=/\b[PCBU][0-9A-F]{4}\b/gi;
-function show(id){['start','questions','report','history'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo(0,0)}
-function val(id){return $(id).value.trim()}
-function getCase(){return {vehicle:{make:val('make'),model:val('model'),year:val('year'),engine:val('engine')},symptom:val('symptom'),when:val('when'),codes:[...new Set((val('codes').match(codeRx)||[]).map(x=>x.toUpperCase()))],scanner:val('scanner'),warm:val('warm'),loop:val('loop'),created:new Date().toISOString()}}
+const DB='garageDxCases';
+let mode='easy',current=null,questions=[],answers=[],qi=0,lastReport=null;
+const show=id=>{['intake','questions','report','history'].forEach(x=>$(x).classList.toggle('hidden',x!==id));window.scrollTo(0,0)};
+const panel=id=>{['vehiclePanel','symptomPanel','livePanel'].forEach(x=>$(x).classList.toggle('hidden',x!==id))};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const checked=name=>document.querySelector(`input[name="${name}"]:checked`)?.value||'';
+function setMode(m){mode=m;$('easyMode').classList.toggle('active',m==='easy');$('proMode').classList.toggle('active',m==='pro');$('livePanel').querySelectorAll('input,select,textarea').forEach(x=>x.disabled=false);$('ect').closest('.field').classList.toggle('hidden',m==='easy');$('rpm').closest('.field').classList.toggle('hidden',m==='easy');}
+$('easyMode').onclick=()=>setMode('easy');$('proMode').onclick=()=>setMode('pro');
+function getCase(){
+ const symptom=checked('symptom');
+ const codes=$('codes').value.toUpperCase().split(/[\s,;]+/).filter(Boolean).map(x=>x.trim());
+ const live={ect:$('ect').value,rpm:$('rpm').value,stft1:$('stft1').value,ltft1:$('ltft1').value,stft2:$('stft2').value,ltft2:$('ltft2').value,warm:$('warm').value,loop:$('loop').value,same:$('same').value};
+ return {vehicle:{make:$('make').value.trim(),model:$('model').value.trim(),year:$('year').value,engine:$('engine').value.trim()},symptom,when:$('when').value,codes,scanner:$('scanner').value,live,notes:$('notes').value.trim(),mode};
+}
+const common=[{t:'Is the symptom happening right now?',o:['Yes','No','Intermittent','Not sure']},{t:'Any warning light or message?',o:['Check engine','Oil pressure','Temperature warning','Other warning','No warning','Not sure']}];
 function qset(d){
- const common=[{t:'Is the symptom present right now?',o:['Yes','No — intermittent','Not sure']},{t:'Has any repair or part replacement happened recently?',o:['Yes','No','Not sure']}];
  const map={
- 'Overheating':[{t:'Is the gauge in the red, warning active, or steam visible?',o:['Yes','No','Not sure'],s:'If yes, stop safely, switch off and do not restart to test.'},{t:'When does temperature rise?',o:['Stopped / idling','Slow traffic','Highway speed too','Both stopped and moving','Not sure']},{t:'Does the cooling fan run when commanded / when hot?',o:['Does not run','Runs normally','Runs intermittently / slowly','Not checked','Not sure']},{t:'When completely cold, coolant level?',o:['Below minimum','Correct level','Visible leak','Not checked','Not sure']}],
- 'Low power':[{t:'Does the engine shake or misfire when power drops?',o:['Yes','No — smooth but weak','Sometimes','Not sure']},{t:'When is power loss strongest?',o:['Low RPM / from stop','High RPM / under load','After warming up','All the time','Not sure']},{t:'Is the check-engine light flashing?',o:['Flashing','Steady','Off','Not sure'],s:'Flashing MIL with rough running: avoid driving under load.'}],
- 'Rough idle / misfire':[{t:'What happens at idle?',o:['Strong shaking','RPM hunts up and down','Nearly stalls','Mild vibration','Not sure']},{t:'Any cylinder-specific misfire code?',o:['Yes','No','Not scanned']},{t:'Is the check-engine light flashing?',o:['Flashing','Steady','Off','Not sure'],s:'Flashing MIL or severe shaking: avoid driving.'}],
- 'No start':[{t:'What happens when you try to start?',o:['No crank / silence','One click / repeated clicks','Cranks slowly','Cranks normally but will not start','Not sure']},{t:'Do dash lights dim or reset?',o:['Yes','No','Not sure']}],
- 'Warning light':[{t:'Which warning is present?',o:['Oil pressure','Engine temperature','Check engine','Charging / battery','ABS / traction','Other / unknown'],s:'Oil pressure or temperature warning: stop safely and switch off.'},{t:'Is the warning steady or flashing?',o:['Steady','Flashing','Comes and goes','Not sure']}],
- 'Smoke or burning smell':[{t:'What do you notice?',o:['Smoke from engine bay','Burning oil smell','Fuel smell','Electrical / plastic smell','Exhaust smell in cabin','Other / unsure'],s:'Fuel leak, heavy smoke or electrical burning: switch off and keep clear.'},{t:'When does it happen?',o:['Accelerating','Stopped / idle','After driving','All the time','Not sure']}],
- 'Electrical issue':[{t:'Which symptom best matches?',o:['Slow crank / flat battery','Lights flicker','Multiple warning lights','Modules lose communication','Other / unsure']},{t:'When does it happen?',o:['During starting','While driving','Both','Not sure']}],
- 'Unusual noise':[{t:'What kind of noise?',o:['Knock / metallic tapping','Squeal','Grinding','Rattle','Whine / hum','Other / unsure']},{t:'What changes the noise?',o:['Engine RPM','Road speed','Braking / turning','No clear pattern','Not sure']}]
+ 'Overheating':[{t:'Did the temperature reach the red zone, show a warning, or produce steam?',o:['Yes','No','Not sure']},{t:'When is temperature highest?',o:['Stopped / idle','Slow traffic','Highway speed','Under load / uphill','All conditions','Not sure']},{t:'Is coolant level low when checked completely cold?',o:['Yes','No','Visible leak','Not checked / unsure']},{t:'Does the cooling fan operate when commanded?',o:['Yes','No','Not tested','Not sure']}],
+ 'Low power':[{t:'When is power loss most noticeable?',o:['Low RPM','High RPM','Acceleration / load','All the time','Intermittent']},{t:'Does the engine shake or misfire?',o:['Yes','No','Not sure']},{t:'Does the check-engine light flash?',o:['Yes','No','Not sure']}],
+ 'Rough idle / misfire':[{t:'Is the roughness present at idle?',o:['Yes','No','Only under load','Intermittent']},{t:'Does the check-engine light flash?',o:['Yes','No','Not sure']},{t:'Are cylinder-specific misfire codes present?',o:['Yes','No','Not scanned']}],
+ 'No start':[{t:'What happens when you try to start?',o:['No crank / no sound','Slow crank','Cranks but will not start','Starts then stalls']},{t:'Are dashboard lights dim or flickering?',o:['Yes','No','Not sure']},{t:'Has battery voltage been tested during cranking?',o:['Yes','No']}],
+ 'Warning light':[{t:'Which warning is displayed?',o:['Oil pressure','Temperature','Check engine','Battery / charging','ABS / traction','Other / unsure']},{t:'Is the warning red or accompanied by abnormal noise / overheating?',o:['Yes','No','Not sure']}],
+ 'Smoke / smell':[{t:'What is the closest description?',o:['Fuel / petrol smell','Burning electrical / plastic smell','Burning oil smell','Coolant / sweet smell','Exhaust smell','Unknown']},{t:'Where is smoke or smell noticed?',o:['Engine bay','Under vehicle','Inside cabin','Exhaust outlet','Not sure']},{t:'Is there visible smoke or an active fuel leak?',o:['Yes','No','Not sure']}],
+ 'Electrical':[{t:'What electrical symptom occurs?',o:['Slow crank / no crank','Lights flicker','Multiple warning lights','Modules lose communication','Other / unsure']},{t:'Does it happen during starting or while driving?',o:['Starting','While driving','Both','Not sure']}],
+ 'Noise':[{t:'What kind of noise?',o:['Knock / metallic tapping','Squeal','Grinding','Rattle','Whine / hum','Other / unsure']},{t:'What changes the noise?',o:['Engine RPM','Road speed','Braking / turning','No clear pattern','Not sure']}]
  };
  return [...(map[d.symptom]||[]),...common];
 }
-function renderQ(){$('progress').textContent=`QUESTION ${qi+1} OF ${questions.length}`;$('qtitle').textContent=questions[qi].t;$('qhelp').textContent=questions[qi].s||'Choose the closest answer. Not sure is acceptable.';$('qoptions').innerHTML=questions[qi].o.map(o=>`<label class="choice"><input type="radio" name="answer" value="${esc(o)}" ${answers[qi]===o?'checked':''}>${esc(o)}</label>`).join('');$('prevQ').disabled=qi===0;$('nextQ').textContent=qi===questions.length-1?'Build report':'Next'}
-function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function renderQ(){$('qProgress').textContent=`QUESTION ${qi+1} OF ${questions.length}`;$('qTitle').textContent=questions[qi].t;$('qHelp').textContent='Choose the closest answer. If uncertain, select Not sure.';$('qOptions').innerHTML=questions[qi].o.map(o=>`<label class="choice"><input type="radio" name="answer" value="${esc(o)}" ${answers[qi]===o?'checked':''}>${esc(o)}</label>`).join('');$('prevQ').disabled=qi===0;$('nextQ').textContent=qi===questions.length-1?'Build report':'Next →';}
 function codePlan(c){
- if(['P0171','P0174'].includes(c))return {name:'Lean condition',why:c==='P0171'?'Bank 1 fuel system is reporting lean.':'Bank 2 fuel system is reporting lean.',steps:[
- 'Save freeze-frame data and all related codes before clearing anything. Note RPM, load, coolant temperature and whether the code sets at idle or under load.',
- 'With engine off, inspect intake ducting after the MAF, clamps, PCV hoses, vacuum lines, brake-booster hose and manifold connections for splits or disconnections.',
- 'When fully warm and in closed loop, record STFT and LTFT for both banks at idle, then at a steady raised RPM with no load. Compare only readings captured under matching conditions.',
- 'If positive trims are strongest at idle and improve as RPM rises, investigate an intake / vacuum leak. Confirm with an approved smoke test; do not use flammable spray.',
- 'If trims remain positive, verify MAF plausibility and wiring, then test fuel pressure and delivery under the condition that sets the code using the exact OEM specification.',
- 'Repair only the confirmed leak, wiring fault or component failure. Recheck trims and confirm the code does not return under the original conditions.'
- ],caution:'The code does not prove an oxygen sensor is faulty. Similar correction on both banks can suggest a shared air-metering or fuel-delivery issue; a single-bank pattern warrants bank-specific intake/exhaust checks.'};
- if(/^P030[0-8]$/.test(c))return {name:'Misfire',why:c==='P0300'?'Random / multiple-cylinder misfire detected.':`Cylinder ${c.slice(-1)} misfire detected.`,steps:[
- 'If MIL flashes or engine shakes severely, avoid driving under load. Save all codes and freeze-frame data first.',
- 'Use misfire counters or supported Mode $06 data to confirm the affected cylinder(s) and operating condition. A code identifies a misfire, not the failed part.',
- 'For a cylinder-specific fault, inspect the plug, coil connector and wiring. Check plug type, condition and gap against the correct engine specification.',
- 'If the OEM procedure permits, swap the suspect coil with a known-good cylinder and repeat the same controlled test. If the misfire follows the coil, that supports a coil fault; if it stays, continue.',
- 'If it stays on the same cylinder, test injector command and delivery, then perform compression and leak-down tests using the manufacturer procedure. Check for a local intake leak.',
- 'For P0300, investigate shared causes too: air leaks, fuel pressure, MAF plausibility, power/grounds, timing and mechanical condition. Verify repair by rechecking misfire counters.'
- ],caution:'Do not replace all coils, plugs or injectors from the code alone. Repeated misfire can damage the catalytic converter.'};
- if(c==='P0128')return {name:'Coolant temperature below regulating threshold',why:'The engine control module detected warm-up / temperature regulation behavior outside its calibrated expectation.',steps:[
- 'With engine completely cold, compare ECT and IAT readings with ambient temperature. An implausible difference points toward sensor, connector, wiring or data validity checks.',
- 'Check coolant level only when fully cold. Inspect for leaks and confirm correct fill / bleed procedure.',
- 'Monitor ECT from cold start and compare warm-up behavior with the manufacturer diagnostic procedure. Do not use a generic temperature as a pass/fail limit.',
- 'If ECT data is plausible but warm-up is too slow, verify thermostat operation and whether the cooling fan is running when it should not.',
- 'Test the ECT circuit and thermostat against vehicle-specific specifications. Replace only the item that fails its test, then verify warm-up and code status.'
- ],caution:'P0128 does not automatically condemn the thermostat. Low coolant, sensor bias, wiring faults and operating conditions can affect diagnosis. Never open a hot cooling system.'};
- if(c==='P0101')return {name:'MAF range / performance',why:'The reported air-flow signal is outside expected correlation; this does not by itself prove the MAF sensor is defective.',steps:[
- 'Save freeze-frame and check for intake leaks, loose clamps, damaged ducting and other air/fuel codes.',
- 'Inspect MAF connector, pins, wiring, power and ground using the wiring diagram.',
- 'Check the air filter and intake path for blockage or incorrect / disturbed modifications.',
- 'Compare MAF data with RPM, throttle, calculated load and engine specifications under controlled conditions.',
- 'If the signal remains implausible, test the circuit and sensor using OEM procedures before replacement.'
- ],caution:'Do not clean or replace the sensor blindly. Use the correct cleaner only if the manufacturer permits.'};
+ if(['P0171','P0174'].includes(c))return {name:'System too lean',steps:['Save freeze-frame and all related codes before clearing. Record RPM, load, ECT and whether the fault occurs at idle or under load.','Inspect intake ducting after MAF, clamps, PCV and vacuum hoses, brake-booster hose and manifold connections with engine off.','Compare STFT/LTFT for both banks at warm closed-loop idle and steady raised RPM under matching conditions.','If positive trims are strongest at idle and improve with RPM, confirm an intake leak using an approved smoke test. Never use flammable spray.','If trims remain positive, test MAF plausibility, wiring, fuel pressure and delivery against the exact OEM specification.'],caution:'A lean code does not prove an oxygen sensor is faulty. Confirm the cause by testing.'};
+ if(/^P030[0-8]$/.test(c))return {name:'Misfire',steps:['If MIL flashes or engine shakes severely, avoid driving under load. Save codes and freeze-frame.','Use misfire counters / supported Mode $06 data to identify cylinder and operating condition.','Inspect the affected plug, coil connector and wiring; verify plug type and gap against engine specifications.','If permitted by OEM procedure, swap the suspect coil and repeat the same test. If misfire follows, coil fault is supported; if it stays, continue.','Test injector command/delivery, compression and leak-down as indicated. For P0300 also check shared air, fuel, power/ground and mechanical causes.'],caution:'Do not replace coils, plugs or injectors from the code alone. Repeated misfire can damage the catalyst.'};
+ if(c==='P0128')return {name:'Coolant temperature below regulating threshold',steps:['From a fully cold start, compare ECT and IAT with ambient temperature.','Check coolant level only when fully cold and inspect for leaks.','Monitor warm-up against the vehicle-specific procedure; do not apply a generic pass/fail temperature.','If data is plausible but warm-up is slow, verify thermostat operation and fan behavior.','Test ECT circuit and thermostat using OEM specifications before replacement.'],caution:'P0128 does not automatically condemn the thermostat.'};
+ if(c==='P0101')return {name:'MAF range / performance',steps:['Save freeze-frame and check intake leaks, loose clamps and related air/fuel codes.','Inspect MAF connector, wiring, power and ground using the wiring diagram.','Check filter and intake path for restriction or modifications.','Compare MAF data with RPM, throttle and calculated load using OEM data.','Test sensor and circuit before replacement.'],caution:'Do not clean or replace the sensor blindly.'};
+ if(['P0520','P0521','P0522','P0523','P0524'].includes(c))return {name:'Engine oil pressure circuit / pressure concern',critical:true,steps:['Do not run the engine if the oil-pressure warning is active, pressure is low, or knocking is present.','Check oil level on level ground using the correct procedure; inspect for leaks and correct oil/filter application.','A qualified technician should verify mechanical oil pressure with the specified gauge and OEM pressure/temperature/RPM procedure before restart.','Only after pressure is confirmed safe, test the sensor circuit, connector, wiring and scan data against the wiring diagram.'],caution:'The DTC alone does not prove the pressure sensor has failed. P0524 is treated as a stop-priority code.'};
  return null;
 }
-function makeAssessment(d){
- const a=answers,findings=[],tests=[];let stop=false,stopMsg='';
- if(d.symptom==='Overheating'&&a[0]==='Yes'){stop=true;stopMsg='STOP — temperature danger reported. If this is happening now, stop safely, switch off, do not restart to test, and never open the hot cooling system.';findings.push(['Safety priority','Continued operation can cause severe engine damage. Establish safety before diagnosis.']);tests.push('Let the engine cool completely. Arrange recovery if the gauge reached red, steam appeared, or overheating returns. A technician can then inspect cold coolant level and leaks, followed by OEM pressure, fan and circulation tests.');}
- else if(d.symptom==='Overheating'){
- findings.push(['Cooling-system fault not yet isolated','Potential causes include coolant loss, fan control, thermostat, radiator restriction, circulation or pressure-cap issues.']);
- const when=a[1]||'';
- if(when==='Stopped / idling'||when==='Slow traffic')tests.push('Prioritize fan command versus actual operation, fan speeds, fuses, relays, wiring, grounds and airflow. A fan that does not run may have a motor, power, control or wiring fault.');
- else tests.push('When completely cold, check coolant level and visible leaks. If level is correct, follow OEM cooling-system pressure, thermostat, radiator-flow and circulation tests.');
- if(a[2]==='Does not run')tests.push('Test fan power and ground under load and verify the control command before condemning the fan motor.');
- if(a[3]==='Below minimum'||a[3]==='Visible leak')tests.push('Find and repair the coolant leak, refill and bleed using the vehicle-specific procedure, then pressure-test cold. Do not simply keep topping up without finding the loss.');
- } else if(d.symptom==='Low power'||d.symptom==='Rough idle / misfire'){
- findings.push(['Air, fuel, ignition or mechanical fault','Current symptom alone cannot identify a failed part. Use codes and misfire counters to choose the next test.']);
- tests.push('Save all codes and freeze-frame data. Check whether the MIL flashes and note whether the symptom occurs at idle, under load, hot or cold.');
- tests.push('Inspect intake ducting, connectors, grounds and visible wiring. Do not unplug sensors with the engine running.');
- tests.push('If misfire is present, use cylinder counters and follow the ignition → injector → compression sequence for the affected cylinder. Do not replace parts based on symptom alone.');
- } else if(d.symptom==='No start'){
- findings.push(['First separate crank, slow-crank and crank-no-start','These are different fault paths; starter, battery, immobilizer and engine-management diagnosis must not be mixed.']);
- tests.push('Measure battery voltage at rest and during crank, then perform a battery load test and inspect terminals / grounds. Use OEM thresholds.');
- tests.push('If no crank: verify start authorization, park/neutral input, starter relay command and starter voltage drop using the wiring diagram.');
- tests.push('If it cranks normally but will not start: scan for RPM while cranking, immobilizer status, spark, injector pulse and fuel pressure using approved procedures.');
- } else {
- findings.push(['Insufficient evidence to name a failed component','The current symptom category needs targeted observations, codes and measurements before a part can be recommended.']);
- tests.push('Record the exact warning / noise / smell, when it occurs, and whether it changes with engine RPM, road speed, braking or load.');
- tests.push('Scan all modules and save codes plus freeze-frame before clearing. Follow the vehicle-specific diagnostic tree for the exact system.');
+function liveAnalysis(d){
+ const l=d.live,parse=k=>l[k]===''?null:Number(l[k]),a=parse('stft1'),b=parse('ltft1'),c=parse('stft2'),e=parse('ltft2');
+ const valid=x=>x===null||(Number.isFinite(x)&&x>=-100&&x<=100);
+ if(!['stft1','ltft1','stft2','ltft2'].every(k=>valid(parse(k))))return '<div class="alert"><strong>Implausible fuel-trim value.</strong><p>Verify scanner PID, units and entered value. No combined interpretation is shown.</p></div>';
+ const combine=(x,y)=>x===null||y===null?null:((1+x/100)*(1+y/100)-1)*100;
+ const t1=combine(a,b),t2=combine(c,e),fmt=x=>x===null?'—':x.toFixed(1)+'%';
+ let out=[];
+ if(t1!==null)out.push(`Bank 1 combined correction estimate: ${fmt(t1)}.`);
+ if(t2!==null)out.push(`Bank 2 combined correction estimate: ${fmt(t2)}.`);
+ if(t1===null&&t2===null)out.push('No complete same-bank STFT/LTFT pair was entered. A complete pair is required.');
+ else if((t1===null)!==(t2===null))out.push('Only one bank has a complete pair. The other bank is incomplete; do not compare banks.');
+ if(l.warm!=='Yes'||l.loop!=='Closed loop')out.push('Interpretation deferred: confirm fully warmed engine and closed-loop operation.');
+ else if(t1!==null&&t2!==null&&l.same!=='Yes')out.push('Bank comparison deferred: capture both banks at the same RPM and load.');
+ else if(t1!==null&&t2!==null&&l.same==='Yes'){
+ const diff=t1-t2;
+ if(Math.abs(t1)>=15&&Math.abs(t2)>=15&&Math.abs(diff)<10&&Math.sign(t1)===Math.sign(t2))out.push('Both banks show a similar notable correction. Investigate shared air-metering, intake leak or fuel-delivery evidence; no part is identified.');
+ else if(Math.abs(diff)>=10)out.push('One bank differs notably. Repeat the test, then prioritize bank-specific intake/exhaust and sensor evidence.');
+ else if(Math.abs(t1)<10&&Math.abs(t2)<10)out.push('No notable correction in this sample using a preliminary ±10% screening band. This is not an OEM limit and does not rule out intermittent faults.');
+ else out.push('Mixed / borderline pattern. Repeat at matching conditions and compare with vehicle-specific specifications.');
  }
- const critical=d.codes.some(c=>['P0520','P0521','P0522','P0523'].includes(c))||((d.symptom==='Warning light')&&a[0]==='Oil pressure');
- if(critical){stop=true;stopMsg='STOP — oil-pressure warning / related oil-pressure code. Switch off safely and do not restart until oil level and pressure are verified with the correct procedure.';findings.unshift(['Critical lubrication risk','Low oil pressure can cause rapid engine damage. A code or warning does not identify the failed part; mechanical pressure verification is required.']);tests.unshift('Do not run the engine to gather live data. Check oil level only on level ground and follow the owner / service manual. Arrange mechanical oil-pressure testing before restart.');}
- return {findings,tests,stop,stopMsg};
+ return '<div class="cause"><strong>Preliminary fuel-trim screening</strong><p>'+out.map(esc).join('</p><p>')+'</p><p class="help">Combined estimate = (1 + STFT) × (1 + LTFT) − 1. Screening guidance only; not a manufacturer pass/fail threshold.</p></div>';
 }
-function renderCode(c){const p=codePlan(c);return `<details><summary>${esc(c)} — ${esc(p?.name||'Code definition / OEM lookup required')}</summary><p>${esc(p?.why||'This code is not covered by the current guided test library. Use the exact manufacturer service information and check related codes before replacing parts.')}</p>${p?'<ol>'+p.steps.map(x=>`<li>${esc(x)}</li>`).join('')+'</ol><p class="help"><b>Important:</b> '+esc(p.caution)+'</p>':'<p class="help">No guessed repair path is shown for this code. Add verified manufacturer-specific diagnostic information before using it for repair decisions.</p>'}</details>`}
-function finish(){
- const d=current,r=makeAssessment(d),codes=d.codes;
- $('reportTitle').textContent=`${d.vehicle.year} ${d.vehicle.make} ${d.vehicle.model} · ${d.symptom}`;
- $('reportIntro').textContent=`Initial timing: ${d.when}. Codes: ${codes.join(', ')||'none supplied'}. This is a ranked preliminary assessment, not a confirmed diagnosis.`;
- $('safety').innerHTML=r.stop?`<div class="alert"><h3>${esc(r.stopMsg)}</h3></div>`:'<div class="card good">No stop-condition was identified from the answers provided. Continue safely and follow service procedures.</div>';
- $('findings').innerHTML=r.findings.map(x=>`<div class="card"><b>${esc(x[0])}</b><p>${esc(x[1])}</p></div>`).join('');
- $('testplan').innerHTML=r.tests.map((x,i)=>`<div class="step"><b>${r.stop?'SAFETY / TEST ACTION':'TEST '+(i+1)}</b><div>${esc(x)}</div></div>`).join('');
- $('codeplans').innerHTML=codes.length?codes.map(renderCode).join(''):'No codes entered. Symptom-based checks only; do not infer a fault code.';
- $('limitations').textContent='No live OBD connection is implemented. No sensor values were verified by the app. Manufacturer-specific specifications, wiring diagrams, scan-tool PID validity and service bulletins must be checked for the exact VIN / engine calibration. Never use generic thresholds as OEM pass/fail limits. A part replacement is justified only when a test confirms that component has failed.';
- lastReport={...d,answers:questions.map((q,i)=>({question:q.t,answer:answers[i]||'Not answered'})),assessment:r};
- show('report');
+function buildReport(d){
+ const qa=questions.map((q,i)=>({question:q.t,answer:answers[i]||'Not answered'}));
+ const av=answers,findings=[],tests=[];let urgent=null;
+ const codeRules=d.codes.map(codePlan).filter(Boolean);
+ const oilCode=d.codes.some(c=>['P0520','P0521','P0522','P0523','P0524'].includes(c));
+ const overheatingNow=d.symptom==='Overheating'&&av[0]==='Yes';
+ const electricalFire=d.symptom==='Smoke / smell'&&av[0]==='Burning electrical / plastic smell'&&av[2]==='Yes';
+ const fuelLeak=d.symptom==='Smoke / smell'&&av[0]==='Fuel / petrol smell'&&av[2]==='Yes';
+ const warningOil=d.symptom==='Warning light'&&av[0]==='Oil pressure';
+ if(oilCode||warningOil)urgent={title:'STOP — oil pressure risk',message:'Do not run or restart the engine until oil pressure is verified. Continued operation can cause rapid engine damage.',action:'Switch off safely. Check oil level only as specified. Arrange professional mechanical pressure verification before restart.'};
+ else if(overheatingNow)urgent={title:'STOP — overheating danger',message:'Temperature reached red / warning / steam reported. Do not restart to collect data and never open a hot cooling system.',action:'Stop safely, switch off, allow complete cooling and arrange recovery if needed.'};
+ else if(electricalFire)urgent={title:'STOP — possible electrical fire risk',message:'Visible smoke with a burning electrical / plastic smell may indicate an active short or overheating wiring.',action:'Switch off safely, move away if smoke/fire continues and seek emergency assistance as appropriate. Do not reconnect or energize the circuit.'};
+ else if(fuelLeak)urgent={title:'STOP — possible fuel leak',message:'Visible smoke or active fuel leak with fuel smell creates a fire risk.',action:'Switch off, avoid sparks/flames, move away and arrange professional recovery. Do not restart.'};
+ if(urgent){findings.push(['Safety priority','Routine diagnostics are paused until the hazard is resolved.']);tests.push(urgent.action);}
+ else{
+ if(d.symptom==='Overheating'){findings.push(['Cooling system fault not isolated','Possible coolant loss, fan control, thermostat, radiator restriction, circulation or pressure-cap issue.']);tests.push('When fully cold, check coolant level and visible leaks. Follow OEM pressure, fan-command, thermostat and circulation tests.');if(av[1]==='Stopped / idle'||av[1]==='Slow traffic')tests.unshift('Prioritize fan command versus actual operation, fan speeds, fuses, relays, wiring and grounds. Test power/ground under load before condemning the motor.');}
+ else if(d.symptom==='No start'){findings.push(['Separate no-crank from crank-no-start','These are different diagnostic paths; do not mix starter and engine-management checks.']);tests.push('Measure battery voltage at rest and during cranking; perform battery load test and inspect terminals/grounds.');tests.push('No crank: verify start authorization, park/neutral input, relay command and starter voltage drop using wiring diagram.');tests.push('Cranks but will not start: verify scan RPM while cranking, immobilizer status, spark, injector pulse and fuel pressure with approved procedures.');}
+ else if(d.symptom==='Low power'||d.symptom==='Rough idle / misfire'){findings.push(['Air, fuel, ignition or mechanical fault','Current symptom cannot identify a failed part. Use codes, freeze-frame and misfire counters.']);tests.push('Save all codes and freeze-frame. Check whether MIL flashes and note the operating condition.');tests.push('Inspect intake ducting, connectors, grounds and visible wiring.');tests.push('If misfire exists, identify affected cylinder(s), then test ignition → injector → compression as indicated.');}
+ else {findings.push(['Insufficient evidence to identify a failed component','Use the observations and code-specific tests below; confirm every suspected fault with a measurement.']);tests.push('Record exact conditions, warnings, noises or smells. Scan all modules and save freeze-frame before clearing codes.');}
+ }
+ if(codeRules.length)codeRules.forEach(p=>findings.push([p.name,'A supported code family is present. Follow the ordered checks below; code alone does not condemn a component.']));
+ else if(d.codes.length)findings.push(['OEM lookup required','One or more entered codes are not covered by the guided rule library. No guessed repair path is supplied. Retrieve exact manufacturer-specific diagnostic information.']);
+ if(d.symptom==='Smoke / smell'&&!urgent)tests.unshift('If smoke, fuel smell or burning electrical smell increases, stop operation. Inspect only when safe and cool; do not use open flame or energize suspect wiring.');
+ if(d.notes)findings.push(['Additional observation',d.notes]);
+ const codeHTML=d.codes.length?d.codes.map(c=>{const p=codePlan(c);return `<details><summary>${esc(c)} — ${esc(p?.name||'OEM lookup required')}</summary>${p?'<ol>'+p.steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol><p class="help">'+esc(p.caution)+'</p>':'<p>No validated guided path for this code. Consult OEM service information; do not infer a failed part.</p>'}</details>`}).join(''):'No fault codes supplied. Symptom-based checks only.';
+ lastReport={...d,answers:qa,findings,tests,urgent,created:new Date().toISOString()};
+ $('urgent').innerHTML=urgent?`<div class="alert" role="alert"><div class="eyebrow">SAFETY PRIORITY</div><h2>${esc(urgent.title)}</h2><p>${esc(urgent.message)}</p><strong>Action:</strong> ${esc(urgent.action)}</div>`:'';
+ $('reportTitle').textContent=[d.vehicle.year,d.vehicle.make,d.vehicle.model,d.vehicle.engine].filter(Boolean).join(' ')+' — '+d.symptom;
+ $('reportIntro').textContent=`When: ${d.when}. Codes: ${d.codes.join(', ')||'None supplied'}. Preliminary assessment only — not a confirmed diagnosis.`;
+ $('findings').innerHTML=findings.map(x=>`<div class="cause"><strong>${esc(x[0])}</strong><p>${esc(x[1])}</p></div>`).join('');
+ $('testPlan').innerHTML=tests.map((x,i)=>`<div class="step"><b>${urgent?'SAFETY ACTION':'TEST '+(i+1)}</b><p>${esc(x)}</p></div>`).join('')||'<div class="notice">No additional test can be safely recommended from the supplied evidence.</div>';
+ $('codePlans').innerHTML=codeHTML;
+ $('liveAnalysis').innerHTML=liveAnalysis(d);
+ const liveEntries=Object.entries(d.live).filter(([k,v])=>v!==''&&v!==null&&v!=='Unknown').map(([k,v])=>`${k}: ${v}`);
+ $('evidence').innerHTML='<p><strong>Guided answers</strong></p>'+qa.map((x,i)=>`<div class="cause"><strong>Q${i+1}: ${esc(x.question)}</strong><p>${esc(x.answer)}</p></div>`).join('')+'<p><strong>Manual live data</strong></p><p>'+esc(liveEntries.join(' · ')||'No live data entered')+'</p>';
+ $('saveCase').textContent='Save case';show('report');
 }
-$('startBtn').onclick=()=>{current=getCase();questions=qset(current);answers=[];qi=0;renderQ();show('questions')};
-$('prevQ').onclick=()=>{if(qi>0){qi--;renderQ()}else show('start')};
-$('nextQ').onclick=()=>{const a=document.querySelector('input[name=answer]:checked');if(!a){alert('Choose an answer or go back.');return}answers[qi]=a.value;if(qi<questions.length-1){qi++;renderQ()}else finish()};
+$('toSymptoms').onclick=()=>panel('symptomPanel');$('backVehicle').onclick=()=>panel('vehiclePanel');
+$('toLive').onclick=()=>{if(!checked('symptom')){alert('Choose a symptom first.');return;}panel('livePanel');};
+$('backSymptoms').onclick=()=>panel('symptomPanel');
+$('startQuestions').onclick=()=>{current=getCase();questions=qset(current);answers=[];qi=0;renderQ();show('questions');};
+$('prevQ').onclick=()=>{if(qi>0){qi--;renderQ()}else{show('intake');panel('livePanel')}};
+$('nextQ').onclick=()=>{const a=document.querySelector('input[name="answer"]:checked');if(!a){alert('Choose an answer first.');return;}answers[qi]=a.value;if(qi<questions.length-1){qi++;renderQ()}else buildReport(current)};
+$('editCase').onclick=()=>{show('intake');panel('livePanel')};
+$('saveCase').onclick=()=>{if(!lastReport)return;const h=getHistory();if(lastReport.id){alert('This case has already been saved.');return;}lastReport.id=Date.now();h.unshift(lastReport);try{localStorage.setItem(DB,JSON.stringify(h.slice(0,100)));updateCount();$('saveCase').textContent='Saved ✓';}catch(e){alert('Could not save in this browser. Print the report instead.');}};
 function getHistory(){try{return JSON.parse(localStorage.getItem(DB)||'[]')}catch(e){return[]}}
-function renderHistory(){const h=getHistory();$('historyList').innerHTML=h.length?h.map((x,i)=>`<details><summary>${esc(x.vehicle.year)} ${esc(x.vehicle.make)} ${esc(x.vehicle.model)} — ${esc(x.symptom)}</summary><p>${esc(new Date(x.created).toLocaleString())}</p><p>Codes: ${esc(x.codes.join(', ')||'None')}</p><p>Answers: ${x.answers.map(a=>esc(a.question)+': '+esc(a.answer)).join(' · ')}</p><p class="muted">Saved assessment only; this is not a confirmed diagnosis.</p><button class="secondary" onclick="viewSaved(${i})">View saved summary</button></details>`).join(''):'No saved cases.';show('history')}
-window.viewSaved=i=>{const x=getHistory()[i];if(!x)return;alert(`${x.vehicle.year} ${x.vehicle.make} ${x.vehicle.model}\n${x.symptom}\nCodes: ${x.codes.join(', ')||'None'}\n\n${x.assessment.findings.map(f=>f[0]+': '+f[1]).join('\n')}`)};
-$('historyBtn').onclick=renderHistory;$('backHome').onclick=()=>show('start');
-$('saveBtn').onclick=()=>{if(!lastReport)return;const h=getHistory();h.unshift(lastReport);localStorage.setItem(DB,JSON.stringify(h.slice(0,50)));$('saveBtn').textContent='Saved';$('saveBtn').disabled=true};
-$('clearHistory').onclick=()=>{if(confirm('Delete all saved cases from this browser?')){localStorage.removeItem(DB);renderHistory()}};
-$('printBtn').onclick=()=>window.print();$('newBtn').onclick=()=>{current=null;lastReport=null;$('saveBtn').disabled=false;$('saveBtn').textContent='Save case';show('start')};
-$('resetBtn').onclick=()=>{document.querySelectorAll('#start input').forEach(x=>x.value='');$('make').value='Dodge';$('model').value='Charger R/T';$('year').value='2015';$('engine').value='5.7L HEMI V8';$('symptom').selectedIndex=0;$('when').selectedIndex=0;$('scanner').selectedIndex=0;$('warm').selectedIndex=0;$('loop').selectedIndex=0};
+function updateCount(){$('caseCount').textContent=getHistory().length}
+function renderHistory(){const h=getHistory();$('historyList').innerHTML=h.length?h.map((x,i)=>`<details><summary>${esc(x.vehicle?.year||'')} ${esc(x.vehicle?.make||'')} ${esc(x.vehicle?.model||'')} — ${esc(x.symptom||'')}<br><small>${esc(new Date(x.created||x.id||Date.now()).toLocaleString())}</small></summary><p>Codes: ${esc((x.codes||[]).join(', ')||'None')}</p><p>Findings: ${esc((x.findings||[]).map(z=>z[0]+': '+z[1]).join(' | '))}</p><p>Answers: ${esc((x.answers||[]).map(z=>z.question+': '+z.answer).join(' | '))}</p><button class="btn" data-view="${i}">View saved report</button></details>`).join(''):'No saved cases yet.';show('history');$('historyList').querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{const x=h[Number(b.dataset.view)];lastReport=x;$('reportTitle').textContent=[x.vehicle?.year,x.vehicle?.make,x.vehicle?.model,x.vehicle?.engine].filter(Boolean).join(' ')+' — '+x.symptom;$('reportIntro').textContent='Saved preliminary report.';$('urgent').innerHTML=x.urgent?`<div class="alert"><h2>${esc(x.urgent.title)}</h2><p>${esc(x.urgent.message)}</p><p>${esc(x.urgent.action)}</p></div>`:'';$('findings').innerHTML=(x.findings||[]).map(z=>`<div class="cause"><strong>${esc(z[0])}</strong><p>${esc(z[1])}</p></div>`).join('');$('testPlan').innerHTML=(x.tests||[]).map((z,i)=>`<div class="step"><b>TEST ${i+1}</b><p>${esc(z)}</p></div>`).join('');$('codePlans').innerHTML=(x.codes||[]).map(c=>`<p>${esc(c)} — ${esc(codePlan(c)?.name||'OEM lookup required')}</p>`).join('');$('liveAnalysis').innerHTML=liveAnalysis(x);$('evidence').textContent='Saved case record. Values are manually entered and not independently verified.';show('report');});}
+$('historyBtn').onclick=renderHistory;$('backHistory').onclick=()=>{show('intake');panel('vehiclePanel')};
+$('exportHistory').onclick=()=>{const blob=new Blob([JSON.stringify(getHistory(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='garage-diagnostic-cases.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('clearHistory').onclick=()=>{if(confirm('Delete all saved cases from this browser?')){localStorage.removeItem(DB);updateCount();renderHistory()}};
+$('printReport').onclick=()=>window.print();
+$('newCase').onclick=()=>{if(!confirm('Start a new case? Unsaved report changes will be lost.'))return;document.querySelectorAll('input').forEach(x=>{if(x.type==='radio')x.checked=false;else if(x.id!=='make'&&x.id!=='model'&&x.id!=='year'&&x.id!=='engine')x.value=''});$('make').value='Dodge';$('model').value='Charger R/T';$('year').value='2015';$('engine').value='5.7L V8 HEMI';$('warm').value='Unknown';$('loop').value='Unknown';$('same').value='Unknown';$('when').selectedIndex=0;$('scanner').selectedIndex=0;lastReport=null;show('intake');panel('vehiclePanel')};
+updateCount();setMode('easy');
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+})();
 </script></body></html>
