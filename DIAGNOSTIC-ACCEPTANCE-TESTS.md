@@ -1,32 +1,27 @@
-# Build 15.1 acceptance test matrix
+# Build 15.2 acceptance tests
 
-Use synthetic values only for software checks. Do not treat sample values as readings from a real vehicle.
+## Mode separation
+1. Open the app. Easy Mode is selected and only Easy Mode is highlighted.
+2. Choose a symptom and continue. Easy Mode skips the Workshop Data panel.
+3. Complete Easy questions. Confirm report says `EASY MODE` and hides Live-data analysis.
+4. Return to intake and choose Workshop / Pro Mode. Confirm only Pro is highlighted and the mode description changes.
+5. Continue. Confirm Workshop Data panel appears before Pro questions.
+6. Complete Pro questions. Confirm report says `WORKSHOP / PRO MODE` and shows Live-data analysis.
+7. Switch back to Easy Mode. Confirm ECT/RPM/STFT/LTFT are not part of the Easy flow.
 
-| Test | Input / setup | Expected result |
-|---|---|---|
-| Version | Load deployed app | Header and report show Build 15.1 |
-| Cache | Inspect `sw.js` | Namespace is `garage-dx-build-15-1` |
-| Easy / Pro | Switch modes | Both controls work; Easy hides selected advanced ECT/RPM fields |
-| Guided questions | Select each symptom | Relevant adaptive questions appear and report builds |
-| P0171 / P0174 | Enter code | Lean-condition test sequence appears; no O2 sensor replacement assumption |
-| P0300–P0308 | Enter code | Misfire path appears; cylinder-specific code is described |
-| Other P03xx | Enter P0315 | No generic misfire classification |
-| P0128 | Enter code | Cold ECT/IAT and warm-up checks appear; thermostat not condemned automatically |
-| P0101 | Enter code | Intake, wiring, MAF plausibility checks appear |
-| P0524 | Enter code | Safety-priority stop instruction appears; no engine-running live-data test |
-| Overheating | Answer Yes to red-zone / steam question | Safety priority appears and routine checks are paused |
-| Fuel leak | Smoke/smell = fuel, visible smoke/leak = Yes | Stop-priority warning appears |
-| Electrical smoke | Burning electrical smell + visible smoke = Yes | Stop-priority warning appears |
-| No trims | Leave all STFT/LTFT blank | No trim conclusion |
-| Incomplete pair | Enter STFT B1 only | Complete same-bank pair requirement shown |
-| One bank | Enter STFT + LTFT B1 only | B1 estimate shown; bank comparison deferred |
-| Context gate | Both banks entered; warm or closed-loop unknown | Interpretation deferred |
-| Matching gate | Both banks complete; same RPM/load = No | Bank comparison deferred |
-| Valid context | Both pairs; warm Yes; closed loop; same conditions Yes | Preliminary comparison appears |
-| Implausible trim | Enter value outside -100 to +100 | Interpretation paused and verification warning appears |
-| Save / history | Save a case, open history | Case is listed and summary can be reopened |
-| Export | Export history | JSON file downloads |
-| Print | Print report | Browser print view opens |
+## Data and report
+8. In Pro Mode, enter a complete STFT/LTFT pair but leave warm-up or closed-loop unknown. Confirm interpretation is deferred.
+9. Enter complete pairs for both banks and confirm warm + closed loop + same RPM/load. Confirm screening calculation appears.
+10. Enter an out-of-range trim (e.g. 150). Confirm no interpretation is shown.
+11. Confirm header and report both show Build 15.2.
+12. Save a report, open Case History, reopen it, and compare mode, answers, findings, tests and codes.
+13. Export JSON and print the report.
+14. Start a new case and confirm observations, codes, readings and selected symptom are cleared.
 
-## Scope
-This is a manual acceptance checklist. Static checks do not replace browser interaction tests, GitHub Pages deployment verification, scanner validation or a technician's diagnosis.
+## Safety and scope
+15. Test oil pressure warning / P0520–P0524, overheating red-zone response, visible fuel leak and electrical smoke response.
+16. Confirm unsupported DTCs are referred to OEM service information.
+17. Confirm no UI claims live OBD connection or confirmed diagnosis.
+
+## Not covered by static acceptance
+Safari installation, offline behavior, physical OBD scanner validation, OEM threshold validation and real-vehicle repair validation require separate testing.
