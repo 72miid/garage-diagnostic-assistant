@@ -1,29 +1,25 @@
-# Diagnostic acceptance tests — Build 13
+# Build 14 acceptance test matrix
 
-All tests use simulated data. No test result is a real vehicle diagnosis.
+Use synthetic values only for software checks. Never treat sample values as readings from a real vehicle.
 
-## Fuel trim classification
-For all comparison tests, select: engine fully warmed = Yes; fuel system = Closed loop; same RPM/load across banks = Yes.
+| Test | Input / setup | Expected result |
+|---|---|---|
+| Build label | Load deployed app | Header and footer show BUILD 14 |
+| Cache | Inspect `sw.js` | Cache namespace ends in `v14` |
+| P0300 | Enter code P0300 | Misfire guidance appears |
+| P0308 | Enter code P0308 | Misfire guidance appears; cylinder 8 code description shown |
+| Other P03xx | Enter a non-P0300–P0308 P03xx code (e.g. P0315) | No generic misfire classification; generic code guidance only |
+| No trims | Leave all STFT/LTFT fields blank | Report says no fuel-trim values entered and makes no trim conclusion |
+| Incomplete pair | Enter STFT B1 only | Report says both STFT and LTFT from one bank are required |
+| One complete bank | Enter STFT + LTFT B1 only | B1 estimate shown; B2 marked incomplete; no bank comparison |
+| Two banks, unknown context | Enter both pairs; leave warm-up/loop/matching condition unknown | Combined estimates may be displayed, but interpretation is deferred |
+| Two banks, open loop | Enter both pairs; warm Yes; loop Open loop | Fuel-trim conclusion deferred |
+| Two banks, mismatched conditions | Enter both pairs; warm Yes; Closed loop; same condition No | Bank comparison deferred |
+| Valid matching context | Enter both pairs; warm Yes; Closed loop; same condition Yes | Preliminary pattern classification appears; no component is declared failed |
+| Implausible trim | Enter any trim below −100 or above +100 | Interpretation paused and value verification warning appears |
+| Data disclaimer | Generate report with or without numeric entries | Report states values are manual and app cannot verify vehicle/PID/units/conditions; sample values are not real measurements |
+| Save/export | Save a report and export history | Case includes manually entered values and context fields |
+| Safety | Trigger a safety-priority scenario | Routine checks remain paused as in Build 13 |
 
-1. **Shared positive correction:** Bank 1 STFT +15, LTFT +12; Bank 2 STFT +17, LTFT +14. Expect both combined estimates (~+28.8% and ~+33.4%) and a shared-pattern explanation. Do not name a failed part.
-2. **Bank-specific positive correction:** Bank 1 STFT +25, LTFT +18; Bank 2 STFT +3, LTFT +5. Expect a stronger Bank 1 pattern and bank-specific checks, not a definitive component diagnosis.
-3. **Low corrections:** Bank 1 +3/+5; Bank 2 +2/+4. Expect no notable combined correction in this sample, not a declaration that the vehicle is fault-free.
-4. **Shared negative correction:** Bank 1 −15/−12; Bank 2 −17/−14. Expect similar notable negative correction on both banks.
-5. **Conditions unknown / cold / open loop:** Expect classification to be deferred; show the estimates only with a clear caution.
-6. **Different RPM/load across banks:** Expect comparison to be deferred and request a repeat under matching conditions.
-7. **Only one complete bank pair:** Show one combined estimate and state that bank comparison is unavailable.
-8. **Implausible trim outside −100% to +100%:** Pause fuel-trim interpretation and ask to verify sign, units and PID.
-9. **Difference near threshold:** Do not overstate borderline differences; retain cautious language.
-
-## Other live data and safety
-10. ECT 120°C: prompt verification; stop safely and switch off if actual overheating/warning is present; never open a hot cooling system.
-11. RPM 0: ask whether engine off/cranking/PID unavailable; do not diagnose from zero alone.
-12. All live data blank: do not invent readings or show a false conclusion.
-13. Flashing MIL with rough running: safety priority, avoid driving and save codes/freeze-frame when safe.
-
-## App integrity
-14. New diagnosis clears numeric live-data fields and resets context selectors to Unknown.
-15. Saved history and JSON export preserve all six numeric values and three measurement-context values.
-16. Older saved cases missing new context fields must not crash; missing context is treated as Unknown.
-17. Header/footer show BUILD 13 and service-worker cache name is v13.
-18. JavaScript parses successfully; HTML IDs are unique.
+## Scope
+This matrix is a manual acceptance checklist. Static source checks and JavaScript syntax validation do not replace browser interaction tests, deployment checks, scanner verification, or a technician's diagnosis.

@@ -1,4 +1,4 @@
-const CACHE_NAME = "garage-dx-complete-audit-v13";
+const CACHE_NAME = "garage-dx-complete-audit-v14";
 const APP_FILES = ["./", "./index.html", "./manifest.json"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)).then(() => self.skipWaiting()));
