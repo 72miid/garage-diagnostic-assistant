@@ -18,7 +18,7 @@
 </style>
 </head>
 <body><div class="app">
-<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE · BUILD 12</small></div></header>
+<header><div class="logo">Dx</div><div><h1>Garage Diagnostic Assistant</h1><small>WORKSHOP INTELLIGENCE · EASY MODE · BUILD 13</small></div></header>
 <section class="hero"><div class="eyebrow">DIAGNOSE WITH CONFIDENCE</div><h2>Tell me what the car is doing.</h2><p class="muted">Answer one question at a time. The report uses your answers to prioritize safe next checks.</p><div class="mode"><button class="btn primary active" id="easy" type="button">Easy mode</button><button class="btn" id="pro" type="button">Workshop mode</button></div></section>
 <div class="row" style="margin:12px 0"><button class="btn" id="new" type="button">＋ New diagnosis</button><button class="btn" id="historyBtn" type="button">Case history (<span id="count">0</span>)</button></div>
 <section id="formArea">
@@ -33,12 +33,12 @@
 <div class="field"><label>When does it happen?</label><div class="symptoms"><label class="symptom"><input type="radio" name="whenChoice" value="At idle / stopped">At idle / stopped</label><label class="symptom"><input type="radio" name="whenChoice" value="While driving">While driving</label><label class="symptom"><input type="radio" name="whenChoice" value="During acceleration">When accelerating</label><label class="symptom"><input type="radio" name="whenChoice" value="All the time">All the time</label><label class="symptom"><input type="radio" name="whenChoice" value="Intermittent">Comes and goes</label><label class="symptom"><input type="radio" name="whenChoice" value="Unknown" checked>Not sure</label></div></div>
 <div class="row"><button class="btn" id="backCar" type="button">← Back</button><button class="btn primary" id="toScanner" type="button">Continue →</button></div></div>
 <div class="panel hidden" id="scannerStep"><div class="eyebrow">STEP 3 OF 3</div><h3>Do you have a diagnostic scanner?</h3><div class="symptoms"><label class="symptom"><input type="radio" name="scannerChoice" value="No scanner / not connected" checked>No scanner</label><label class="symptom"><input type="radio" name="scannerChoice" value="Scanner available">Yes, I have one</label></div><div class="field"><label>Fault codes (optional)</label><input id="codes" placeholder="e.g. P0300, if known"></div><p class="help">A code is a clue, not proof a part has failed.</p><div class="row"><button class="btn" id="backSymptoms" type="button">← Back</button><button class="btn primary" id="diagnose" type="button">Guide me through diagnosis →</button></div></div>
-<div class="panel hidden" id="advancedFields"><div class="eyebrow">WORKSHOP MODE</div><h3>Optional live data</h3><div class="grid"><div class="field"><label>Coolant temperature (°C)</label><input id="ect" type="number" placeholder="e.g. 98"></div><div class="field"><label>RPM</label><input id="rpm" type="number" placeholder="e.g. 750"></div><div class="field"><label>STFT bank 1 (%)</label><input id="stft" type="number" placeholder="e.g. 3"></div><div class="field"><label>LTFT bank 1 (%)</label><input id="ltft" type="number" placeholder="e.g. 5"></div><div class="field"><label>STFT bank 2 (%)</label><input id="stft2" type="number" placeholder="e.g. 2"></div><div class="field"><label>LTFT bank 2 (%)</label><input id="ltft2" type="number" placeholder="e.g. 4"></div></div><p class="help">Enter readings from the same operating condition. Bank comparison is preliminary and requires vehicle-specific service data.</p></div>
+<div class="panel hidden" id="advancedFields"><div class="eyebrow">WORKSHOP MODE</div><h3>Optional live data</h3><div class="grid"><div class="field"><label>Coolant temperature (°C)</label><input id="ect" type="number" placeholder="e.g. 98"></div><div class="field"><label>RPM</label><input id="rpm" type="number" placeholder="e.g. 750"></div><div class="field"><label>STFT bank 1 (%)</label><input id="stft" type="number" placeholder="e.g. 3"></div><div class="field"><label>LTFT bank 1 (%)</label><input id="ltft" type="number" placeholder="e.g. 5"></div><div class="field"><label>STFT bank 2 (%)</label><input id="stft2" type="number" placeholder="e.g. 2"></div><div class="field"><label>LTFT bank 2 (%)</label><input id="ltft2" type="number" placeholder="e.g. 4"></div></div><div class="field"><label>Was the engine fully warmed up?</label><select id="engineWarm"><option value="Unknown" selected>Not sure</option><option value="Yes">Yes</option><option value="No">No</option></select></div><div class="field"><label>Fuel system status on scanner</label><select id="closedLoop"><option value="Unknown" selected>Not sure / unavailable</option><option value="Closed loop">Closed loop</option><option value="Open loop">Open loop</option></select></div><div class="field"><label>Were both banks recorded under the same condition?</label><select id="sameCondition"><option value="Unknown" selected>Not sure</option><option value="Yes">Yes — same RPM and load</option><option value="No">No — different conditions</option></select></div><p class="help">For a meaningful comparison, use a fully warmed engine in closed loop and capture both banks at the same RPM/load. Do not perform unsafe road tests. Manufacturer specifications take priority.</p></div>
 </section>
 <section id="interactiveStep" class="hidden"><div class="panel"><div class="eyebrow" id="questionProgress">DIAGNOSTIC QUESTION</div><h2 id="questionTitle">Let’s narrow it down.</h2><p class="muted" id="questionHelp"></p><div id="questionOptions" class="symptoms"></div><p class="help" id="questionSafety"></p><div class="row"><button class="btn" id="questionBack" type="button">← Back</button><button class="btn primary" id="questionNext" type="button">Next question →</button></div></div></section>
 <section id="report" class="hidden"><div id="urgentBox"></div><div class="result"><div class="eyebrow">FIRST ASSESSMENT</div><h2 id="title"></h2><p id="intro"></p><span class="tag">Preliminary guidance — not a confirmed diagnosis</span></div><div class="panel"><h3>What the evidence may suggest</h3><div id="causes"></div></div><div class="panel"><h3>Your next checks</h3><div id="checks"></div></div><div class="panel"><h3>Code interpretation</h3><div id="codeInfo"></div><p class="help">Code status (stored, pending, permanent) must be read from a compatible scanner; it cannot be determined from the code number alone.</p></div><div class="panel"><h3>Your answers</h3><div id="answerSummary"></div></div><div class="row"><button class="btn primary" id="save" type="button">Save case</button><button class="btn" id="back" type="button">Edit answers</button><button class="btn" id="print" type="button">Print report</button></div></section>
 <section id="history" class="hidden"><div class="panel"><h3>Saved cases</h3><p class="help">Open a case to review its stored answers, vehicle details, codes and manually entered data. Older saved cases may not contain every field.</p><div id="historyList" class="muted">No saved cases yet.</div><div class="row"><button class="btn" id="historyBack" type="button">Back to diagnosis</button><button class="btn" id="export" type="button">Export history</button></div></div></section>
-<div class="foot">Prototype · BUILD 12. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
+<div class="foot">Prototype · BUILD 13. No live OBD connection or code clearing. This tool cannot confirm a failed part. Use vehicle-specific service information; stop if the vehicle may be unsafe.</div></div>
 <script>
 (()=>{
 'use strict';
@@ -64,7 +64,7 @@ if(d.codes.some(c=>c.startsWith('P03'))){causes.unshift(['Misfire code','The cod
 if(d.codes.includes('P0128')){causes.unshift(['Coolant warm-up code','P0128 can indicate slow warm-up or temperature regulation issues; sensor accuracy and operating conditions need verification.']);checks.unshift('Compare cold-engine coolant temperature with ambient temperature and follow model-specific warm-up tests.');}
 if(!causes.length){causes.push(['More evidence needed','The current description is not enough to rank a cause reliably.']);checks.push('Record exactly what happens and when. If possible, read and save codes before clearing anything.');}
 return {causes,checks};}
-function getCase(){const raw=$('codes').value.toUpperCase().match(/[PCBU][0-9A-F]{4}/g)||[];return{make:checked('makeChoice'),model:checked('modelChoice'),year:checked('yearChoice'),engine:checked('engineChoice'),symptom:checked('mainSymptom'),when:checked('whenChoice')||'Not sure',scanner:checked('scannerChoice'),codes:[...new Set(raw)],liveData:{ect:$('ect').value,rpm:$('rpm').value,stft:$('stft').value,ltft:$('ltft').value,stft2:$('stft2').value,ltft2:$('ltft2').value},created:new Date().toISOString()};}
+function getCase(){const raw=$('codes').value.toUpperCase().match(/[PCBU][0-9A-F]{4}/g)||[];return{make:checked('makeChoice'),model:checked('modelChoice'),year:checked('yearChoice'),engine:checked('engineChoice'),symptom:checked('mainSymptom'),when:checked('whenChoice')||'Not sure',scanner:checked('scannerChoice'),codes:[...new Set(raw)],liveData:{ect:$('ect').value,rpm:$('rpm').value,stft:$('stft').value,ltft:$('ltft').value,stft2:$('stft2').value,ltft2:$('ltft2').value,engineWarm:$('engineWarm').value,closedLoop:$('closedLoop').value,sameCondition:$('sameCondition').value},created:new Date().toISOString()};}
 function questionsFor(d){
 const q={
 'Overheating':[
@@ -244,34 +244,62 @@ function analyzeLiveData(d){
  const v=d.liveData||{}, out=[];
  const num=k=>v[k]!==''&&v[k]!==null&&v[k]!==undefined&&Number.isFinite(Number(v[k]))?Number(v[k]):null;
  const ect=num('ect'),rpm=num('rpm'),stft=num('stft'),ltft=num('ltft'),stft2=num('stft2'),ltft2=num('ltft2');
+ const warm=v.engineWarm||'Unknown', loop=v.closedLoop||'Unknown', same=v.sameCondition||'Unknown';
+ const validTrim=x=>x===null||(x>=-100&&x<=100);
+ const trimKeys=[['STFT Bank 1',stft],['LTFT Bank 1',ltft],['STFT Bank 2',stft2],['LTFT Bank 2',ltft2]];
+ const invalid=trimKeys.filter(([k,x])=>!validTrim(x));
+ if(invalid.length) out.push(['Fuel-trim value needs verification','One or more entered trim values are outside the broad plausibility screen of −100% to +100%. Check sign, units, PID selection and scanner display before interpretation.']);
  if(ect!==null){
-  if(ect< -40||ect>200) out.push(['Coolant temperature entry needs verification','The entered value is outside a plausible normal sensor display range. Confirm units, scanner PID and entry before using it.']);
-  else if(ect>=115) out.push(['High coolant temperature reading — verify promptly','This value is high enough to warrant checking the actual gauge/warning and confirming the reading with vehicle-specific specifications. If the engine is overheating or a warning is active, stop safely and switch off; never open a hot cooling system.']);
-  else if(ect<70) out.push(['Coolant temperature is low for a fully warmed engine','This may be normal if the engine is cold or not fully warmed. Compare with ambient temperature and warm-up state before suspecting a thermostat or sensor.']);
-  else out.push(['Coolant temperature entry','The entered value alone does not indicate an obvious extreme. Interpretation depends on warm-up state, ambient conditions and the vehicle specification.']);
+  if(ect< -40||ect>200) out.push(['Coolant temperature entry needs verification','The entered value is outside a plausible sensor display range. Confirm units, scanner PID and entry.']);
+  else if(ect>=115) out.push(['High coolant temperature reading — verify promptly','Confirm the actual gauge/warning and vehicle specification. If overheating or a warning is active, stop safely and switch off. Never open a hot cooling system.']);
+  else if(ect<70) out.push(['Coolant temperature is low for a fully warmed engine','This may be normal before warm-up. Do not interpret fuel trims as a normal closed-loop baseline until warm-up and fuel-system status are confirmed.']);
+  else out.push(['Coolant temperature entry','The value alone does not indicate an obvious extreme. Confirm actual warm-up state and vehicle-specific specification.']);
  }
  if(rpm!==null){
-  if(rpm<0||rpm>10000) out.push(['RPM entry needs verification','Confirm the value, units and engine state; this is not a plausible ordinary running reading for this vehicle.']);
-  else if(rpm===0) out.push(['RPM reads zero','Confirm whether the engine was off, cranking, or the scanner PID was unavailable. A zero value alone cannot diagnose a fault.']);
-  else out.push(['RPM entry','RPM must be interpreted with engine state and load. A single RPM value without commanded/actual throttle, speed and load data cannot identify the cause of low power.']);
+  if(rpm<0||rpm>10000) out.push(['RPM entry needs verification','Confirm the value, units and engine state.']);
+  else if(rpm===0) out.push(['RPM reads zero','Confirm whether the engine was off, cranking or the PID was unavailable.']);
+  else out.push(['RPM entry','RPM alone cannot identify the cause of low power. Record load, throttle, vehicle speed and operating condition with it.']);
  }
- if(stft!==null){
-  if(Math.abs(stft)>=20) out.push(['STFT Bank 1 is strongly shifted','A correction of this size deserves confirmation under the same operating conditions. Check for air/fuel delivery or sensor-related causes using service procedures; this does not identify a failed part.']);
-  else if(Math.abs(stft)>=10) out.push(['STFT Bank 1 shows a notable correction','Compare at warm closed-loop idle and raised RPM, and compare both banks if available. Conditions and manufacturer specifications matter.']);
-  else out.push(['STFT Bank 1 entry','This value is within a commonly seen small-correction range, but only if the engine is warm and operating in closed loop. Verify context and compare with the other bank.']);
+ if(invalid.length===0){
+  const total=(a,b)=>a!==null&&b!==null?((1+a/100)*(1+b/100)-1)*100:null;
+  const t1=total(stft,ltft),t2=total(stft2,ltft2);
+  const fmt=x=>(x>0?'+':'')+x.toFixed(1)+'%';
+  const bank1Ready=t1!==null,bank2Ready=t2!==null;
+  const contextOK=warm==='Yes'&&loop==='Closed loop';
+  const comparisonOK=same==='Yes';
+  if(stft!==null&&ltft!==null) out.push(['Bank 1 combined correction estimate', 'STFT and LTFT combine to approximately '+fmt(t1)+'. This is a calculated screening estimate, not a manufacturer pass/fail limit.']);
+  if(stft2!==null&&ltft2!==null) out.push(['Bank 2 combined correction estimate', 'STFT and LTFT combine to approximately '+fmt(t2)+'. This is a calculated screening estimate, not a manufacturer pass/fail limit.']);
+  if((bank1Ready||bank2Ready)&&!contextOK){
+   out.push(['Fuel-trim conclusion deferred — operating state not confirmed','The engine must be fully warmed and the scanner must show closed loop before using these values for a meaningful fuel-control assessment. Current entries are retained, but do not classify the cause yet.']);
+  } else if(bank1Ready&&bank2Ready&&!comparisonOK){
+   out.push(['Bank comparison deferred — conditions may not match','Both banks must be captured at the same RPM and load. Different conditions can create a misleading difference. Repeat the readings under matching conditions before deciding whether the pattern is shared or bank-specific.']);
+  } else if(bank1Ready&&bank2Ready&&contextOK&&comparisonOK){
+   const diff=t1-t2, abs1=Math.abs(t1),abs2=Math.abs(t2);
+   const high1=abs1>=15, high2=abs2>=15, low1=abs1<10, low2=abs2<10;
+   if(high1&&high2&&Math.abs(diff)<10&&Math.sign(t1)===Math.sign(t2)){
+    const direction=t1>0?'positive (adding fuel)':'negative (removing fuel)';
+    out.push(['Both banks show a similar notable '+direction+' correction','Bank 1 is '+fmt(t1)+' and Bank 2 is '+fmt(t2)+'. A similar pattern across both banks can point toward a shared engine-wide cause rather than one bank alone. Depending on the direction and engine, investigate measured air/load data, intake leaks, MAF plausibility, fuel pressure/delivery and exhaust/O2 sensor evidence using the correct service procedure. This does not identify a failed part.']);
+   } else if((high1&&low2)||(high2&&low1)||Math.abs(diff)>=10){
+    const higher=abs1>abs2?'Bank 1':'Bank 2';
+    out.push(['Fuel-trim pattern is more pronounced on one bank','The combined estimates differ by '+Math.abs(diff).toFixed(1)+' percentage points; '+higher+' has the larger absolute correction. If repeatable, prioritize bank-specific checks such as intake/exhaust leaks near that bank, upstream sensor data and cylinder-specific evidence. Do not replace a sensor based on trims alone.']);
+   } else if(low1&&low2){
+    out.push(['No notable combined fuel-trim correction in this sample','Both calculated corrections are below the app’s preliminary ±10% screening band. This does not rule out a fault, especially under load or if the symptom is intermittent. Compare the readings with vehicle-specific specifications and capture data when the symptom occurs.']);
+   } else {
+    out.push(['Mixed or borderline fuel-trim pattern','The combined corrections do not clearly fit a shared-high, one-bank-high or low-correction pattern. Repeat at warm closed-loop idle and at a safe, controlled raised-RPM condition, then compare with vehicle-specific specifications.']);
+   }
+  } else if(bank1Ready||bank2Ready){
+   out.push(['Only one bank has a complete STFT/LTFT pair','A combined estimate is available only for the bank with both readings. Enter both trims for the other bank under the same conditions before making a bank-to-bank comparison.']);
+  }
+  if(stft!==null&&stft2!==null&&contextOK&&same==='Yes'){
+   const delta=stft-stft2;
+   if(Math.abs(delta)>=10) out.push(['Short-term trims differ notably between banks','STFT differs by '+delta.toFixed(1)+' percentage points. Confirm repeatability and compare LTFT, sensor response and exhaust integrity before assigning a cause.']);
+  }
+ } else {
+  out.push(['Fuel-trim interpretation paused','Correct the implausible value(s) before calculating combined corrections or comparing banks.']);
  }
- if(ltft!==null){
-  if(Math.abs(ltft)>=20) out.push(['LTFT Bank 1 is strongly shifted','Confirm the value and operating conditions. Investigate air leaks, fuel delivery and sensor evidence systematically; the trim alone does not prove a failed part.']);
-  else if(Math.abs(ltft)>=10) out.push(['LTFT Bank 1 shows a notable learned correction','Compare both banks and conditions, and inspect for intake leaks or fuel-delivery issues only as supported by additional evidence.']);
-  else out.push(['LTFT Bank 1 entry','This is within a commonly seen modest range, but it is not conclusive by itself. Compare both banks and confirm the vehicle-specific test conditions.']);
- }
- if(stft!==null&&ltft!==null){const total=((1+stft/100)*(1+ltft/100)-1)*100;if(total>=15)out.push(['Estimated combined Bank 1 fuel correction is notably positive','The multiplicative estimate from STFT and LTFT is about +'+total.toFixed(1)+'%. If confirmed warm and in closed loop, investigate why Bank 1 is adding fuel; compare Bank 2 and check for intake/exhaust leaks and fuel-pressure evidence before conclusions.']);else if(total<=-15)out.push(['Estimated combined Bank 1 fuel correction is notably negative','The multiplicative estimate from STFT and LTFT is about '+total.toFixed(1)+'%. If confirmed warm and in closed loop, investigate why Bank 1 is removing fuel; compare Bank 2 and verify sensor and fuel-control evidence.']);}
- if(stft2!==null){if(Math.abs(stft2)>=20)out.push(['STFT Bank 2 is strongly shifted','Confirm the reading under the same warm, closed-loop operating condition as Bank 1. A trim value alone does not identify a failed part.']);else out.push(['STFT Bank 2 entry','Compare this value with Bank 1 at the same RPM, load and closed-loop condition; small differences can be normal.']);}
- if(ltft2!==null){if(Math.abs(ltft2)>=20)out.push(['LTFT Bank 2 is strongly shifted','Confirm the value and compare with Bank 1 under matching operating conditions. Investigate only with supporting sensor, air and fuel-delivery evidence.']);else out.push(['LTFT Bank 2 entry','Compare with Bank 1 using matching operating conditions and vehicle-specific specifications.']);}
- if(stft!==null&&stft2!==null){const delta=stft-stft2;if(Math.abs(delta)>=10)out.push(['STFT differs notably between banks','Bank 1 and Bank 2 STFT differ by '+delta.toFixed(1)+' percentage points. If readings were captured under identical conditions, prioritize bank-specific checks and verify exhaust leaks/sensor data before replacing parts.']);else out.push(['STFT bank comparison','The entered STFT values are within 10 percentage points of each other. This alone does not rule out a fault; confirm matching conditions and compare LTFT and other data.']);}
- if(ltft!==null&&ltft2!==null){const delta=ltft-ltft2;if(Math.abs(delta)>=10)out.push(['LTFT differs notably between banks','Bank 1 and Bank 2 LTFT differ by '+delta.toFixed(1)+' percentage points. Confirm the readings and use vehicle-specific tests to investigate a possible bank-specific condition.']);}
  if(!out.length)return '<div class="cause"><strong>Live-data analysis</strong><p>No numeric live-data values were entered. Add valid scanner readings to receive preliminary interpretation.</p></div>';
- return '<div class="cause"><strong>Preliminary live-data interpretation</strong><p class="help">Rule-based guidance only; not a diagnosis. Confirm readings, units, engine temperature, closed-loop status and manufacturer specifications.</p>'+out.map(([h,b])=>'<div class="cause"><strong>'+escapeHTML(h)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('')+'</div>';
+ const context='<div class="cause"><strong>Reading conditions</strong><p>Engine fully warmed: '+escapeHTML(warm)+'. Fuel system: '+escapeHTML(loop)+'. Same RPM/load across banks: '+escapeHTML(same)+'.</p><p class="help">Fuel trims are meaningful only in the correct closed-loop operating state. Use vehicle-specific service information; thresholds here are screening guidance, not factory specifications.</p></div>';
+ return '<div class="cause"><strong>Preliminary live-data interpretation</strong><p class="help">Rule-based guidance only; not a diagnosis. Confirm scanner PIDs, units, warm-up state, closed-loop status and manufacturer specifications.</p>'+context+out.map(([h,b])=>'<div class="cause"><strong>'+escapeHTML(h)+'</strong><p>'+escapeHTML(b)+'</p></div>').join('')+'</div>';
 }
 function finishDiagnosis(){
   const d=lastCase;if(!d)return;
@@ -292,8 +320,8 @@ function finishDiagnosis(){
   $('codeInfo').innerHTML=tailored.suppressRoutine
     ?'<div class="notice">Code interpretation is deferred until the vehicle is safe. Do not restart the engine to read codes if doing so could worsen the condition; have a technician retrieve them when appropriate.</div>'
     :(d.codes.length?d.codes.map(c=>'<div class="cause"><strong>'+escapeHTML(c)+'</strong><p>'+escapeHTML(codeDescription(c))+'</p></div>').join(''):'No codes entered. That is okay — continue with symptom-based checks when the vehicle is safe.');
-  const live=Object.entries(d.liveData||{}).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);
-  const liveLabel={ect:'Coolant temperature (°C)',rpm:'RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)',stft2:'STFT bank 2 (%)',ltft2:'LTFT bank 2 (%)'};
+  const live=Object.entries(d.liveData||{}).filter(([k,v])=>!['engineWarm','closedLoop','sameCondition'].includes(k)&&v!==''&&v!==null&&v!==undefined);
+  const liveLabel={ect:'Coolant temperature (°C)',rpm:'RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)',stft2:'STFT bank 2 (%)',ltft2:'LTFT bank 2 (%)',engineWarm:'Engine fully warmed',closedLoop:'Fuel-system status',sameCondition:'Same RPM/load across banks'};
   $('answerSummary').innerHTML=evidence.map((x,i)=>'<div class="cause"><strong>Q'+(i+1)+'</strong><p>'+escapeHTML(x)+'</p></div>').join('')+
     (live.length?'<div class="cause"><strong>Workshop live-data entries</strong><p>'+live.map(([k,v])=>escapeHTML(liveLabel[k]||k)+': '+escapeHTML(v)).join('<br>')+'</p><p class="help">Values are manually entered; verify against the scanner and operating conditions.</p></div>'+analyzeLiveData(d):'');
   showPage('report');
@@ -315,8 +343,8 @@ function renderHistory(){
       ?'<div class="cause"><strong>Diagnostic answers</strong>'+answers.map((a,i)=>'<p><strong>Q'+(i+1)+':</strong> '+escapeHTML(a.question||'Question')+'<br><strong>Answer:</strong> '+escapeHTML(a.answer||'Not answered')+'</p>').join('')+'</div>'
       :'<div class="cause"><strong>Diagnostic answers</strong><p>Answers were not stored for this older case.</p></div>';
     const live=x.liveData||{};
-    const liveLabels={ect:'Coolant temperature (°C)',rpm:'Engine RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)',stft2:'STFT bank 2 (%)',ltft2:'LTFT bank 2 (%)'};
-    const liveValues=Object.entries(live).filter(([k,v])=>v!==''&&v!==null&&v!==undefined);
+    const liveLabels={ect:'Coolant temperature (°C)',rpm:'Engine RPM',stft:'STFT bank 1 (%)',ltft:'LTFT bank 1 (%)',stft2:'STFT bank 2 (%)',ltft2:'LTFT bank 2 (%)',engineWarm:'Engine fully warmed',closedLoop:'Fuel-system status',sameCondition:'Same RPM/load across banks'};
+    const liveValues=Object.entries(live).filter(([k,v])=>!['engineWarm','closedLoop','sameCondition'].includes(k)&&v!==''&&v!==null&&v!==undefined);
     const liveMarkup=liveValues.length
       ?'<div class="cause"><strong>Manually entered live data</strong><p>'+liveValues.map(([k,v])=>escapeHTML(liveLabels[k]||k)+': '+escapeHTML(v)).join('<br>')+'</p><p class="help">Reference only; this prototype does not automatically validate or interpret these values.</p></div>'
       :'<div class="cause"><strong>Live data</strong><p>No values entered.</p></div>';
@@ -337,6 +365,7 @@ $('new').addEventListener('click',()=>{
   lastCase=null;diagnosticQuestions=[];diagnosticAnswers=[];questionIndex=0;
   document.querySelectorAll('input[type="radio"]').forEach(el=>{el.checked=el.defaultChecked;});
   ['codes','ect','rpm','stft','ltft','stft2','ltft2'].forEach(id=>$(id).value='');
+  ['engineWarm','closedLoop','sameCondition'].forEach(id=>$(id).value='Unknown');
   $('save').textContent='Save case';
   showPage('formArea');showStep('carStep');
 });

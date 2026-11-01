@@ -1,55 +1,29 @@
-# Diagnostic acceptance tests — build 9
+# Diagnostic acceptance tests — Build 13
 
-The report must reflect selected answers and must not assert a failed part without confirming evidence.
+All tests use simulated data. No test result is a real vehicle diagnosis.
 
-## Low power
-1. Smooth + under load + steady engine light: choose “No, feels smooth but weak”, “At high speed / under load”, “Steady on”. Expect “Power loss under load — check measured data first”, saved-code/freeze-frame guidance, and no assertion of an active misfire.
-2. Shaking/stuttering: choose “Yes, shakes or stutters” or “Sometimes”. Expect misfire/uneven combustion to be considered, with cylinder-specific tests and no guessed part replacement.
-3. Flashing engine light: expect a safety-priority banner, no hard acceleration/repeated road tests, and codes/freeze-frame guidance.
-4. Repeat low-power diagnosis twice: question count must remain stable.
+## Fuel trim classification
+For all comparison tests, select: engine fully warmed = Yes; fuel system = Closed loop; same RPM/load across banks = Yes.
 
-## Overheating
-5. Red gauge / warning / steam: urgent safety banner and routine tests paused.
-6. Not red + slow traffic + fan does not run + coolant level correct: prioritize fan circuit checks without redundant coolant-level reminders.
-7. Fan runs but temperature rises: verify airflow and cooling-system circulation; do not assume the fan is faulty.
+1. **Shared positive correction:** Bank 1 STFT +15, LTFT +12; Bank 2 STFT +17, LTFT +14. Expect both combined estimates (~+28.8% and ~+33.4%) and a shared-pattern explanation. Do not name a failed part.
+2. **Bank-specific positive correction:** Bank 1 STFT +25, LTFT +18; Bank 2 STFT +3, LTFT +5. Expect a stronger Bank 1 pattern and bank-specific checks, not a definitive component diagnosis.
+3. **Low corrections:** Bank 1 +3/+5; Bank 2 +2/+4. Expect no notable combined correction in this sample, not a declaration that the vehicle is fault-free.
+4. **Shared negative correction:** Bank 1 −15/−12; Bank 2 −17/−14. Expect similar notable negative correction on both banks.
+5. **Conditions unknown / cold / open loop:** Expect classification to be deferred; show the estimates only with a clear caution.
+6. **Different RPM/load across banks:** Expect comparison to be deferred and request a repeat under matching conditions.
+7. **Only one complete bank pair:** Show one combined estimate and state that bank comparison is unavailable.
+8. **Implausible trim outside −100% to +100%:** Pause fuel-trim interpretation and ask to verify sign, units and PID.
+9. **Difference near threshold:** Do not overstate borderline differences; retain cautious language.
 
-## Other symptoms
-8. No-start: distinguish no-crank from crank-no-start.
-9. Rough idle + flashing engine light: prioritize safety and saving codes/freeze-frame data.
-10. Smoke/fuel/electrical-burning smell: safety warning before routine diagnosis.
-11. Oil-pressure or temperature warning: stop safely and switch off.
-12. DTCs P0300–P0308 describe misfire patterns/cylinders; P0171/P0174 indicate lean-condition evidence; P0128 concerns warm-up/temperature regulation. No code alone proves a specific part failed.
+## Other live data and safety
+10. ECT 120°C: prompt verification; stop safely and switch off if actual overheating/warning is present; never open a hot cooling system.
+11. RPM 0: ask whether engine off/cranking/PID unavailable; do not diagnose from zero alone.
+12. All live data blank: do not invent readings or show a false conclusion.
+13. Flashing MIL with rough running: safety priority, avoid driving and save codes/freeze-frame when safe.
 
-## App behavior
-13. New diagnosis resets radio choices, codes, live-data fields, and saved-question state.
-14. Edit answers resumes the diagnostic questionnaire with previous answers selected.
-15. Save/history/export/print remain functional.
-16. Header/footer display BUILD 9 after deployment. If absent, the old page is still being served or cached.
-17. Workshop live-data entries appear in the report as reference-only, not as interpreted results.
-
-
-## Build 10 case-history acceptance tests
-1. Save a completed diagnosis and confirm the history count increases.
-2. Open Case history and expand the saved case.
-3. Confirm all diagnostic questions and selected answers are visible.
-4. Confirm vehicle, symptom, initial timing, scanner status and entered codes are shown.
-5. Enter sample workshop live-data values, save a case, and confirm values are shown as manual/reference-only.
-6. Confirm dates display in device-local format rather than a raw ISO UTC timestamp.
-7. Open an older case without diagnostic answers and confirm the page says answers were not stored instead of crashing.
-
-
-## Build 12 live-data interpretation tests
-1. Enter ECT 98, RPM 750, STFT 3, LTFT 5. Report should show all entries and cautious, contextual notes; it must not claim a failed part.
-2. Enter STFT 25 and LTFT 0. Report should flag a strongly shifted trim and request confirmation under appropriate operating conditions.
-3. Enter STFT 12 and LTFT 8. Report should describe notable positive combined correction and calculate approximately +20%, while emphasizing comparison with Bank 2 and confirming conditions.
-4. Enter ECT 120. Report should advise prompt verification and safe shutdown if actual overheating/warning is present.
-5. Leave all live-data fields blank. Report should not invent readings and should not display live-data interpretation.
-6. Verify service-worker cache name is v11 and header/footer show Build 12.
-
-
-## Build 12 bank comparison tests
-- Enter Bank 1 STFT/LTFT and Bank 2 STFT/LTFT; verify all four appear in the report and saved history.
-- Use equal bank trims: no strong bank-specific conclusion should be made from equality alone.
-- Use a difference of at least 10 percentage points between banks: report should recommend confirming same operating conditions and bank-specific checks, not naming a failed part.
-- Verify missing Bank 2 values do not break analysis or older saved cases.
-- Verify new diagnosis clears both Bank 2 fields.
+## App integrity
+14. New diagnosis clears numeric live-data fields and resets context selectors to Unknown.
+15. Saved history and JSON export preserve all six numeric values and three measurement-context values.
+16. Older saved cases missing new context fields must not crash; missing context is treated as Unknown.
+17. Header/footer show BUILD 13 and service-worker cache name is v13.
+18. JavaScript parses successfully; HTML IDs are unique.
