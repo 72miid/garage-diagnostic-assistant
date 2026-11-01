@@ -1,4 +1,4 @@
-# Build 14 acceptance test matrix
+# Build 14.1 acceptance test matrix
 
 Use synthetic values only for software checks. Never treat sample values as readings from a real vehicle.
 
@@ -23,3 +23,11 @@ Use synthetic values only for software checks. Never treat sample values as read
 
 ## Scope
 This matrix is a manual acceptance checklist. Static source checks and JavaScript syntax validation do not replace browser interaction tests, deployment checks, scanner verification, or a technician's diagnosis.
+
+
+## Build 14.1 regression checks
+- [ ] One complete bank pair + other bank incomplete + warm-up unknown: report the incomplete bank and defer interpretation.
+- [ ] One complete bank pair + other bank incomplete + open loop: report the incomplete bank and defer interpretation.
+- [ ] No trim values: explicitly state no fuel-trim values were entered.
+- [ ] Only one STFT or LTFT value: explicitly state a complete same-bank pair is required.
+- [ ] Both banks complete but conditions differ: defer bank-to-bank comparison.

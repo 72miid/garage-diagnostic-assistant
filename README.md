@@ -1,8 +1,8 @@
-# Garage Diagnostic Assistant — Build 14
+# Garage Diagnostic Assistant — Build 14.1
 
 Mobile-first static diagnostic-guidance PWA for iPhone Safari / GitHub Pages.
 
-## Build 14 changes
+## Build 14.1 changes
 - Narrows the misfire rule to the supported cylinder-misfire family P0300–P0308. Other P03xx codes no longer get automatically labelled as misfires.
 - Reports explicitly when no fuel-trim values are supplied, when a bank has an incomplete STFT/LTFT pair, or when only one bank has a complete pair.
 - Makes the report's manual-data limitation explicit: the app cannot verify vehicle provenance, PID selection, units, or measurement conditions. Example/test numbers are not actual vehicle measurements.
@@ -26,5 +26,8 @@ Mobile-first static diagnostic-guidance PWA for iPhone Safari / GitHub Pages.
 
 ## Verification performed for this package
 - JavaScript syntax check with Node.js (`node --check`).
-- Static checks for Build 14 labels, cache version, narrowed misfire matcher, and explicit incomplete/no-trim branches.
+- Static checks for Build 14.1 labels, cache version, narrowed misfire matcher, and explicit incomplete/no-trim branches.
 - This is not a claim of live Safari, GitHub Pages, or real-vehicle validation.
+
+
+Build 14.1 patch: incomplete/one-bank fuel-trim reporting is now shown before operating-state gates, so missing-bank information is not hidden when warm-up or closed-loop status is unconfirmed.
